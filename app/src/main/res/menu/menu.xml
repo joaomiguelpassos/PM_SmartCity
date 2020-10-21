@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Note Menu with options to create or view -->
+    <item
+        android:id="@+id/menuNotes"
+        android:icon="?attr/actionModePasteDrawable"
+        android:title="@string/menu_notes"
+        app:showAsAction="always">
+        <menu>
+            <item android:id="@+id/create_new_note"
+                android:title="@string/create_new_note"/>
+            <item android:id="@+id/view_notes"
+                android:title="@string/view_notes"/>
+        </menu>
+    </item>
+</menu>

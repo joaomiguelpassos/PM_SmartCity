@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Smart City</string>
+    <string name="menu_notes">Notas</string>
+    <string name="create_new_note">Criar</string>
+    <string name="view_notes">Consultar</string>
+    <string name="add_note">Adicionar Nota</string>
+    <string name="welcome">Bem-vindo!</string>
+</resources>

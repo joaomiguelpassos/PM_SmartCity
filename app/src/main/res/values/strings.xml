@@ -1,3 +1,8 @@
 <resources>
-    <string name="app_name">PM_22689</string>
+    <string name="app_name">Smart City</string>
+    <string name="menu_notes">Notes</string>
+    <string name="create_new_note">Create</string>
+    <string name="view_notes">View</string>
+    <string name="add_note">Add Note</string>
+    <string name="welcome">Welcome!</string>
 </resources>
