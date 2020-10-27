@@ -5,4 +5,7 @@
     <string name="view_notes">View</string>
     <string name="add_note">Add Note</string>
     <string name="welcome">Welcome!</string>
+    <string name="button_save">Save</string>
+    <string name="hint_note">Write your note here...</string>
+    <string name="empty_not_saved">Note not saved because it is empty.</string>
 </resources>
