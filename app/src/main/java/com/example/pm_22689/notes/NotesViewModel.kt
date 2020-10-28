@@ -19,7 +19,7 @@ class NotesViewModel(application: Application) : AndroidViewModel(application) {
     val allNotes: LiveData<List<Notes>>
 
     init {
-        val notesDao = NotesDatabase.getInstance(application).notesDatabaseDao
+        val notesDao = NotesDatabase.getInstance(application, viewModelScope).notesDatabaseDao
         repository = NoteRepository(notesDao)
         allNotes = repository.allWords
     }

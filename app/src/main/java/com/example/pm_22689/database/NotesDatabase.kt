@@ -4,8 +4,11 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.sqlite.db.SupportSQLiteDatabase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
-@Database(entities = [Notes::class], version = 1, exportSchema = false)
+@Database(entities = [Notes::class], version = 2, exportSchema = false)
 abstract class NotesDatabase : RoomDatabase() {
 
     /**
@@ -13,13 +16,36 @@ abstract class NotesDatabase : RoomDatabase() {
      */
     abstract val notesDatabaseDao: NotesDatabaseDao
 
+    private class NoteDatabaseCallback(private val scope: CoroutineScope) : RoomDatabase.Callback() {
+
+        override fun onOpen(db: SupportSQLiteDatabase) {
+            super.onOpen(db)
+            INSTANCE?.let { database ->
+                scope.launch {
+                    populateDatabase(database.notesDatabaseDao)
+                }
+            }
+        }
+
+        suspend fun populateDatabase(noteDao: NotesDatabaseDao) {
+            // Delete all content here.
+            noteDao.clear()
+
+            // Add sample words.
+            var note = Notes(1,"Teste", "20201027")
+            noteDao.insert(note)
+            note = Notes(2,"Teste2", "20201028")
+            noteDao.insert(note)
+        }
+    }
+
     companion object {
 
         @Volatile
         private var INSTANCE: NotesDatabase? = null
 
 
-        fun getInstance(context: Context): NotesDatabase {
+        fun getInstance(context: Context, scope: CoroutineScope): NotesDatabase {
             synchronized(this) {
 
                 // Copy the current value of INSTANCE to a local variable so Kotlin can smart cast.
@@ -32,7 +58,8 @@ abstract class NotesDatabase : RoomDatabase() {
                             NotesDatabase::class.java,
                             "notes_database"
                     )
-                            .fallbackToDestructiveMigration()
+                            //.fallbackToDestructiveMigration()
+                            .addCallback(NoteDatabaseCallback(scope))
                             .build()
                     // Assign INSTANCE to the newly created database.
                     INSTANCE = instance

@@ -10,10 +10,10 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "notes_table")
 data class Notes(
         @PrimaryKey(autoGenerate = true)
-        var noteId: Long = 0L,
+        var noteId: Int? = null,
 
         @ColumnInfo(name = "message")
         val noteMessage: String,
 
         @ColumnInfo(name = "date")
-        val noteDate: String)
+        val noteDate: String? = null)
