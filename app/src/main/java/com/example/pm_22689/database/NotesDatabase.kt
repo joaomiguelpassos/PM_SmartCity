@@ -8,7 +8,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-@Database(entities = [Notes::class], version = 2, exportSchema = false)
+@Database(entities = [Notes::class], version = 3, exportSchema = false)
 abstract class NotesDatabase : RoomDatabase() {
 
     /**
@@ -16,28 +16,28 @@ abstract class NotesDatabase : RoomDatabase() {
      */
     abstract val notesDatabaseDao: NotesDatabaseDao
 
-    private class NoteDatabaseCallback(private val scope: CoroutineScope) : RoomDatabase.Callback() {
-
-        override fun onOpen(db: SupportSQLiteDatabase) {
-            super.onOpen(db)
-            INSTANCE?.let { database ->
-                scope.launch {
-                    populateDatabase(database.notesDatabaseDao)
-                }
-            }
-        }
-
-        suspend fun populateDatabase(noteDao: NotesDatabaseDao) {
-            // Delete all content here.
-            noteDao.clear()
-
-            // Add sample words.
-            var note = Notes(1,"Teste", "20201027")
-            noteDao.insert(note)
-            note = Notes(2,"Teste2", "20201028")
-            noteDao.insert(note)
-        }
-    }
+//    private class NoteDatabaseCallback(private val scope: CoroutineScope) : RoomDatabase.Callback() {
+//
+//        override fun onOpen(db: SupportSQLiteDatabase) {
+//            super.onOpen(db)
+//            INSTANCE?.let { database ->
+//                scope.launch {
+//                    populateDatabase(database.notesDatabaseDao)
+//                }
+//            }
+//        }
+//
+//        suspend fun populateDatabase(noteDao: NotesDatabaseDao) {
+//            // Delete all content here.
+//            noteDao.clear()
+//
+//            // Add sample words.
+//            var note = Notes(1,"Teste", "20201027")
+//            noteDao.insert(note)
+//            note = Notes(2,"Teste2", "20201028")
+//            noteDao.insert(note)
+//        }
+//    }
 
     companion object {
 
@@ -58,8 +58,8 @@ abstract class NotesDatabase : RoomDatabase() {
                             NotesDatabase::class.java,
                             "notes_database"
                     )
-                            //.fallbackToDestructiveMigration()
-                            .addCallback(NoteDatabaseCallback(scope))
+                            .fallbackToDestructiveMigration()
+                            //.addCallback(NoteDatabaseCallback(scope))
                             .build()
                     // Assign INSTANCE to the newly created database.
                     INSTANCE = instance

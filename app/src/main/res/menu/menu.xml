@@ -8,8 +8,8 @@
         android:title="@string/menu_notes"
         app:showAsAction="always">
         <menu>
-            <!--<item android:id="@+id/create_new_note"
-                android:title="@string/create_new_note"/>-->
+            <item android:id="@+id/create_new_note"
+                android:title="@string/create_new_note"/>
             <item android:id="@+id/view_notes"
                 android:title="@string/view_notes"/>
         </menu>
