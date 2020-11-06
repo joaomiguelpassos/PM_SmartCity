@@ -10,9 +10,13 @@ class NoteRepository(private val notesDao: NotesDatabaseDao) {
 
     // Room executes all queries on a separate thread.
     // Observed LiveData will notify the observer when the data has changed.
-    val allWords: LiveData<List<Notes>> = notesDao.getAllNotes()
+    val allNotes: LiveData<List<Notes>> = notesDao.getAllNotes()
 
-    suspend fun insert(word: Notes) {
-        notesDao.insert(word)
+    suspend fun insert(note: Notes) {
+        notesDao.insert(note)
+    }
+
+    suspend fun update(note: Notes){
+        notesDao.update(note)
     }
 }

@@ -6,6 +6,8 @@
     <string name="add_note">Add Note</string>
     <string name="welcome">Welcome!</string>
     <string name="button_save">Save</string>
-    <string name="hint_note">Write your note here...</string>
+    <string name="hint_note">Write your note here…</string>
     <string name="empty_not_saved">Note not saved because it is empty.</string>
+    <string name="edit_note">Edit Note</string>
+    <string name="delete_note">Delete Note</string>
 </resources>

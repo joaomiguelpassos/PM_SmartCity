@@ -9,7 +9,6 @@ import android.widget.Button
 import android.widget.EditText
 
 class NewNoteActivity : AppCompatActivity() {
-
     private lateinit var editNoteView: EditText
 
     public override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,10 +22,8 @@ class NewNoteActivity : AppCompatActivity() {
             if (TextUtils.isEmpty(editNoteView.text)) {
                 setResult(Activity.RESULT_CANCELED, replyIntent)
             } else {
-
-                //Como passar uma data definida pelo sistema como parâmetro do intent?
-                val word = editNoteView.text.toString()
-                replyIntent.putExtra(EXTRA_REPLY, word)
+                val note = editNoteView.text.toString()
+                replyIntent.putExtra(EXTRA_REPLY, note)
                 setResult(Activity.RESULT_OK, replyIntent)
             }
             finish()

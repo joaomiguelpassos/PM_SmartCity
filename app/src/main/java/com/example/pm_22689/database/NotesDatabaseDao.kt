@@ -1,10 +1,7 @@
 package com.example.pm_22689.database
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
-import androidx.room.Update
+import androidx.room.*
 
 @Dao
 interface NotesDatabaseDao {
@@ -13,14 +10,10 @@ interface NotesDatabaseDao {
     suspend fun insert(note: Notes)
 
 
-    @Update
+    @Update (onConflict = OnConflictStrategy.REPLACE)
     suspend fun update(note: Notes)
 
-    /**
-     * Selects and returns the row that matches the supplied start time, which is our key.
-     *
-     * @param key startTimeMilli to match
-     */
+
     @Query("SELECT * from notes_table WHERE noteId = :key")
     suspend fun get(key: Long): Notes
 
@@ -46,4 +39,6 @@ interface NotesDatabaseDao {
      */
     @Query("SELECT * from notes_table WHERE noteId = :key")
     fun getNoteWithId(key: Long): LiveData<Notes>
+
+
 }

@@ -8,5 +8,7 @@
     <string name="welcome">Bem-vindo!</string>
     <string name="button_save">Guardar</string>
     <string name="empty_not_saved">A nota não foi guardada porque está vazia.</string>
-    <string name="hint_note">Escreva aqui a sua nota...</string>
+    <string name="hint_note">Escreva aqui a sua nota…</string>
+    <string name="edit_note">Editar Nota</string>
+    <string name="delete_note">Apagar Nota</string>
 </resources>

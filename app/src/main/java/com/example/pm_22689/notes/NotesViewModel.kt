@@ -19,9 +19,9 @@ class NotesViewModel(application: Application) : AndroidViewModel(application) {
     val allNotes: LiveData<List<Notes>>
 
     init {
-        val notesDao = NotesDatabase.getInstance(application, viewModelScope).notesDatabaseDao
+        val notesDao = NotesDatabase.getInstance(application).notesDatabaseDao
         repository = NoteRepository(notesDao)
-        allNotes = repository.allWords
+        allNotes = repository.allNotes
     }
 
     /**
@@ -29,5 +29,9 @@ class NotesViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun insert(note: Notes) = viewModelScope.launch(Dispatchers.IO) {
         repository.insert(note)
+    }
+
+    fun update(note: Notes) = viewModelScope.launch(Dispatchers.IO) {
+        repository.update(note)
     }
 }

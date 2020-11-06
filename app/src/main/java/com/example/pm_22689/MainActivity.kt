@@ -1,15 +1,14 @@
 package com.example.pm_22689
 
-import android.app.Activity
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 
-const val PARAM1_NAME = "PARAM1_NAME"
+//const val PARAM1_NAME = "PARAM1_NAME"
 
 class MainActivity : AppCompatActivity() {
 
