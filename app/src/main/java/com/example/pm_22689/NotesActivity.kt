@@ -27,6 +27,7 @@ class NotesActivity : AppCompatActivity(), OnNoteItemClickListener {
     private val newNoteActivityRequestCode = 1
     private val updateNoteActivityRequestCode = 2
 
+
     @RequiresApi(Build.VERSION_CODES.O)
     val currentTime = now().toString()
 
@@ -106,9 +107,10 @@ class NotesActivity : AppCompatActivity(), OnNoteItemClickListener {
                 noteViewModel.insert(note)
             }
         } else if (requestCode == updateNoteActivityRequestCode && resultCode == Activity.RESULT_OK) {
-            data?.getStringExtra(EditNoteActivity.EXTRA_REPLY)?.let {
-                val note = Notes(noteMessage = it, noteDate = currentTime)
-                Toast.makeText(applicationContext, it, Toast.LENGTH_LONG).show()
+            data?.getStringExtra(NewNoteActivity.EXTRA_REPLY)?.let {
+                val id = data.getIntExtra(NewNoteActivity.EXTRA_DATA_ID,-1)
+                val note = Notes(noteId = id, noteMessage = it, noteDate = currentTime)
+                Toast.makeText(applicationContext, id.toString(), Toast.LENGTH_LONG).show()
                 noteViewModel.update(note)
             }
 
@@ -120,10 +122,9 @@ class NotesActivity : AppCompatActivity(), OnNoteItemClickListener {
 
     override fun onItemClick(item: Notes, position: Int) {
         //Toast.makeText(this, item.noteMessage, Toast.LENGTH_LONG).show()
-        val intent = Intent(this, EditNoteActivity::class.java)
-        //intent.putExtra("NOTEDATE", item.noteDate)
+        val intent = Intent(this, NewNoteActivity::class.java)
+        intent.putExtra("NOTEID", item.noteId)
         intent.putExtra("NOTEMESSAGE", item.noteMessage)
-        Toast.makeText(applicationContext, item.noteId.toString(), Toast.LENGTH_LONG).show()
         startActivityForResult(intent, updateNoteActivityRequestCode)
     }
 }
