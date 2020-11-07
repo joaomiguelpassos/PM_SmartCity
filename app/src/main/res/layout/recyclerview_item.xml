@@ -10,7 +10,7 @@
         style="@style/notes_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/holo_orange_light"
+        android:background="@android:color/black"
         android:padding="10dp"
         android:textColor="#FAFAFA"
         android:textColorHighlight="#FA0000" />
@@ -20,7 +20,7 @@
         style="@style/notes_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/holo_orange_light"
+        android:background="@android:color/black"
         android:padding="10dp"
         android:textColor="#FBFBFB"
         android:textColorHighlight="#FF0000" />
