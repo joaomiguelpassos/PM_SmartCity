@@ -10,4 +10,6 @@
     <string name="empty_not_saved">Note not saved because it is empty.</string>
     <string name="edit_note">Edit Note</string>
     <string name="delete_note">Delete Note</string>
+    <string name="delete_all">Delete all</string>
+    <string name="deleting_all_data">Deleting all data</string>
 </resources>

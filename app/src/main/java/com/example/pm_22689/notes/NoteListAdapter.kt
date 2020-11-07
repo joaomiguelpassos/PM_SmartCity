@@ -17,11 +17,11 @@ class NoteListAdapter internal constructor(context: Context, var clickListener: 
         val notesDate: TextView = itemView.findViewById(R.id.textView)
         val notesMessage: TextView = itemView.findViewById(R.id.textView1)
 
-        fun initialize(item: Notes, action:OnNoteItemClickListener){
+        fun initialize(item: Notes, action: OnNoteItemClickListener) {
             notesDate.text = item.noteDate
             notesMessage.text = item.noteMessage
 
-            itemView.setOnClickListener{
+            itemView.setOnClickListener {
                 action.onItemClick(item, adapterPosition)
             }
         }
@@ -36,7 +36,7 @@ class NoteListAdapter internal constructor(context: Context, var clickListener: 
         //val current = notes[position]
         //holder.notesDate.text = current.noteDate
         //holder.notesMessage.text = current.noteMessage
-        holder.initialize(notes.get(position),clickListener)
+        holder.initialize(notes.get(position), clickListener)
     }
 
     internal fun setNotes(notes: List<Notes>) {
@@ -45,6 +45,11 @@ class NoteListAdapter internal constructor(context: Context, var clickListener: 
     }
 
     override fun getItemCount() = notes.size
+
+    // ADICIONEI ISTO AQUI
+    fun getNoteAtPosition(position: Int): Notes {
+        return notes[position]
+    }
 }
 
 interface OnNoteItemClickListener{

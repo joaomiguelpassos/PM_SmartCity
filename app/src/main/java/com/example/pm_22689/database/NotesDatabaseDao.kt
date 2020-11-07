@@ -14,6 +14,10 @@ interface NotesDatabaseDao {
     suspend fun update(note: Notes)
 
 
+    @Delete
+    suspend fun deleteNote(note: Notes)
+
+
     @Query("SELECT * from notes_table WHERE noteId = :key")
     suspend fun get(key: Long): Notes
 
@@ -23,7 +27,7 @@ interface NotesDatabaseDao {
      * This does not delete the table, only its contents.
      */
     @Query("DELETE FROM notes_table")
-    suspend fun clear()
+    suspend fun deleteAll()
 
     /**
      * Selects and returns all rows in the table,
