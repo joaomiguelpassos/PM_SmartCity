@@ -16,6 +16,7 @@ class NoteRepository(private val notesDao: NotesDatabaseDao) {
 
     suspend fun insert(note: Notes) {
         notesDao.insert(note)
+
     }
 
     suspend fun update(note: Notes){
