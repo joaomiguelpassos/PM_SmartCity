@@ -13,6 +13,10 @@ abstract class NotesDatabase : RoomDatabase() {
      */
     abstract val notesDatabaseDao: NotesDatabaseDao
 
+    /**
+     * Database pre population
+     * Currently disabled
+     */
 //    private class NoteDatabaseCallback(private val scope: CoroutineScope) : RoomDatabase.Callback() {
 //
 //        override fun onOpen(db: SupportSQLiteDatabase) {

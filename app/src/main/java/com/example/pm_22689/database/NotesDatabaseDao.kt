@@ -2,7 +2,9 @@ package com.example.pm_22689.database
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-
+/**
+ * Data access object. Mapping of SQL queries to functions. Calls the methods only, Rooms takes care of the rest
+ */
 @Dao
 interface NotesDatabaseDao {
 

@@ -8,8 +8,9 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
-//const val PARAM1_NAME = "PARAM1_NAME"
-
+/**
+ * Activity that prompts the login menu to user if never logged in or last session logged out
+ */
 class MainActivity : AppCompatActivity() {
 
 
@@ -24,15 +25,12 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+    // Options menu to navigate to personal notes
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.create_new_note -> {
-                Toast.makeText(this, "criar nova nota", Toast.LENGTH_SHORT).show()
-                true
-            }
             R.id.view_notes -> {
                 val intent = Intent(this, NotesActivity::class.java)
-                startActivity(intent)           //Abre a atividade de consulta de notas
+                startActivity(intent)
                 true
             }
             else -> super.onOptionsItemSelected(item)               //returns false

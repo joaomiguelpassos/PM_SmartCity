@@ -21,13 +21,16 @@ import com.example.pm_22689.notes.OnNoteItemClickListener
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.time.LocalDate.now
 
+/**
+ * Activity that holds the recycler view
+ * Manages UI operations like insert, update or delete
+ */
 
 class NotesActivity : AppCompatActivity(), OnNoteItemClickListener {
     private lateinit var noteViewModel: NotesViewModel
     private val newNoteActivityRequestCode = 1
     private val updateNoteActivityRequestCode = 2
-
-
+    
     @RequiresApi(Build.VERSION_CODES.O)
     val currentTime = now().toString()
 
@@ -63,21 +66,21 @@ class NotesActivity : AppCompatActivity(), OnNoteItemClickListener {
                     viewHolder: RecyclerView.ViewHolder,
                     target: RecyclerView.ViewHolder
                 ): Boolean {
-                    return false
+                    return false            //does nothing 'cause it's not used
                 }
 
                 override fun onSwiped(
                     viewHolder: RecyclerView.ViewHolder,
                     direction: Int
                 ) {
-                    val position = viewHolder.adapterPosition
-                    val myNote: Notes = adapter.getNoteAtPosition(position)
+                    val position = viewHolder.adapterPosition                       // gets the position on recycler
+                    val myNote: Notes = adapter.getNoteAtPosition(position)         // gets the note on that position
 
-                    noteViewModel.deleteNote(myNote)
+                    noteViewModel.deleteNote(myNote)                                // calls method to delete a single note
                 }
             })
 
-        helper.attachToRecyclerView(recyclerView)
+        helper.attachToRecyclerView(recyclerView)                                   // adds the listener to the recycler
 
     }
 
@@ -87,7 +90,7 @@ class NotesActivity : AppCompatActivity(), OnNoteItemClickListener {
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {           //Options menu for deleting all notes
         return when (item.itemId) {
             R.id.clear_data -> {
                 Toast.makeText(this, R.string.deleting_all_data, Toast.LENGTH_SHORT).show()
@@ -101,16 +104,15 @@ class NotesActivity : AppCompatActivity(), OnNoteItemClickListener {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == newNoteActivityRequestCode && resultCode == Activity.RESULT_OK) {
+        if (requestCode == newNoteActivityRequestCode && resultCode == Activity.RESULT_OK) {    //add note
             data?.getStringExtra(NewNoteActivity.EXTRA_REPLY)?.let {
                 val note = Notes(noteMessage = it, noteDate = currentTime)
                 noteViewModel.insert(note)
             }
-        } else if (requestCode == updateNoteActivityRequestCode && resultCode == Activity.RESULT_OK) {
+        } else if (requestCode == updateNoteActivityRequestCode && resultCode == Activity.RESULT_OK) { //update note
             data?.getStringExtra(NewNoteActivity.EXTRA_REPLY)?.let {
                 val id = data.getIntExtra(NewNoteActivity.EXTRA_DATA_ID,-1)
                 val note = Notes(noteId = id, noteMessage = it, noteDate = currentTime)
-                Toast.makeText(applicationContext, id.toString(), Toast.LENGTH_LONG).show()
                 noteViewModel.update(note)
             }
 
@@ -119,9 +121,8 @@ class NotesActivity : AppCompatActivity(), OnNoteItemClickListener {
         }
     }
 
-
+    // Method that starts NewNoteActivity to update a note that was clicked on the recycler
     override fun onItemClick(item: Notes, position: Int) {
-        //Toast.makeText(this, item.noteMessage, Toast.LENGTH_LONG).show()
         val intent = Intent(this, NewNoteActivity::class.java)
         intent.putExtra("NOTEID", item.noteId)
         intent.putExtra("NOTEMESSAGE", item.noteMessage)

@@ -3,7 +3,9 @@ package com.example.pm_22689.notes
 import androidx.lifecycle.LiveData
 import com.example.pm_22689.database.Notes
 import com.example.pm_22689.database.NotesDatabaseDao
-
+/**
+ * Class used to primarily manage multiple data sources
+ */
 // Declares the DAO as a private property in the constructor. Pass in the DAO
 // instead of the whole database, because you only need access to the DAO
 class NoteRepository(private val notesDao: NotesDatabaseDao) {
