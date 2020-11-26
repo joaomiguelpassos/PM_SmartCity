@@ -13,4 +13,10 @@
     <string name="delete_note">Apagar Nota</string>
     <string name="delete_all">Apagar tudo</string>
     <string name="deleting_all_data">Apagando tudo...</string>
+    <string name="signup">Registar</string>
+    <string name="user_name">Nome</string>
+    <string name="user_address">Morada</string>
+    <string name="user_account_login">Já tem uma conta? Clique para entrar</string>
+    <string name="user_signup">Registar</string>
+    <string name="password_lenght">A password deve contem pelo menos 6 caracteres</string>
 </resources>

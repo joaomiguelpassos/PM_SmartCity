@@ -12,4 +12,10 @@
     <string name="delete_note">Delete Note</string>
     <string name="delete_all">Delete all</string>
     <string name="deleting_all_data">Deleting all data</string>
+    <string name="signup">Sign up</string>
+    <string name="user_name">Name</string>
+    <string name="user_address">Address</string>
+    <string name="user_account_login">Already have an Account? Click to Login</string>
+    <string name="user_signup">Sign up</string>
+    <string name="password_lenght">Password needs to be at least 6 character long</string>
 </resources>
