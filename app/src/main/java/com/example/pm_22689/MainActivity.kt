@@ -41,11 +41,11 @@ class MainActivity : AppCompatActivity() {
         editTextPassword = findViewById(R.id.editTextPassword)
 
         findViewById<Button>(R.id.buttonSignUp).setOnClickListener{
-            userSignup()
+            userLogin()
         }
     }
 
-    private fun userSignup(){
+    private fun userLogin(){
         val email = editTextEmail.text.toString().trim { it <= ' ' }
         val password = editTextPassword.text.toString().trim { it <= ' ' }
         val encryptedPassword: String? = encrypt(password,secretKey)
