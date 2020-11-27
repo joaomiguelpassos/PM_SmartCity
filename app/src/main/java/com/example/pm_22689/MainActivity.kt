@@ -13,9 +13,17 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.pm_22689.api.EndPoints
 import com.example.pm_22689.api.OutputPost
 import com.example.pm_22689.api.ServiceBuilder
+import org.bouncycastle.jce.provider.BouncyCastleProvider
+import org.bouncycastle.util.encoders.Base64
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.UnsupportedEncodingException
+import java.security.InvalidKeyException
+import java.security.NoSuchAlgorithmException
+import java.security.Security
+import javax.crypto.*
+import javax.crypto.spec.SecretKeySpec
 
 /**
  * Activity that prompts the login menu to user if never logged in or last session logged out
@@ -23,6 +31,7 @@ import retrofit2.Response
 class MainActivity : AppCompatActivity() {
     private lateinit var editTextEmail: EditText
     private lateinit var editTextPassword: EditText
+    private val secretKey: String = "662ede816988e58fb6d057d9d85605e0"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,9 +45,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun userSignup(){
+    private fun userSignup(){
         val email = editTextEmail.text.toString().trim { it <= ' ' }
         val password = editTextPassword.text.toString().trim { it <= ' ' }
+        val encryptedPassword: String? = encrypt(password,secretKey)
 
         if (email.isEmpty()) {
             editTextEmail.error = "Email is required"
@@ -65,7 +75,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         val request = ServiceBuilder.buildService(EndPoints::class.java)
-        val call = request.login(email, password)
+        val call = request.login(email, encryptedPassword)
         call.enqueue(object : Callback<OutputPost> {
             override fun onResponse(call: Call<OutputPost>, response: Response<OutputPost>) {
                 if (response.isSuccessful) {
@@ -98,5 +108,47 @@ class MainActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)               //returns false
         }
+    }
+
+    fun encrypt(strToEncrypt: String, secret_key: String): String? {
+        Security.addProvider(BouncyCastleProvider())
+        var keyBytes: ByteArray
+
+        try {
+            keyBytes = secret_key.toByteArray(charset("UTF8"))
+            val skey = SecretKeySpec(keyBytes, "AES")
+            val input = strToEncrypt.toByteArray(charset("UTF8"))
+
+            synchronized(Cipher::class.java) {
+                val cipher = Cipher.getInstance("AES/ECB/PKCS7Padding")
+                cipher.init(Cipher.ENCRYPT_MODE, skey)
+
+                val cipherText = ByteArray(cipher.getOutputSize(input.size))
+                var ctLength = cipher.update(
+                    input, 0, input.size,
+                    cipherText, 0
+                )
+                ctLength += cipher.doFinal(cipherText, ctLength)
+                return String(
+                    Base64.encode(cipherText)
+                )
+            }
+        } catch (uee: UnsupportedEncodingException) {
+            uee.printStackTrace()
+        } catch (ibse: IllegalBlockSizeException) {
+            ibse.printStackTrace()
+        } catch (bpe: BadPaddingException) {
+            bpe.printStackTrace()
+        } catch (ike: InvalidKeyException) {
+            ike.printStackTrace()
+        } catch (nspe: NoSuchPaddingException) {
+            nspe.printStackTrace()
+        } catch (nsae: NoSuchAlgorithmException) {
+            nsae.printStackTrace()
+        } catch (e: ShortBufferException) {
+            e.printStackTrace()
+        }
+
+        return null
     }
 }
