@@ -12,7 +12,7 @@
         android:layout_above="@id/linearLayout"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="10dp"
-        android:text="@string/signup"
+        android:text="@string/user_login"
         android:textAppearance="@style/Base.TextAppearance.AppCompat.Headline"
         android:textColor="@color/white" />
 
@@ -23,7 +23,7 @@
         android:layout_centerVertical="true"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:background="@color/purple_500"
+        android:background="@color/design_default_color_primary"
         android:orientation="vertical"
         android:padding="10dp">
 
@@ -51,45 +51,7 @@
             android:textColor="@color/white"
             android:drawableStart="@drawable/ic_baseline_lock_24" />
 
-        <EditText
-            android:id="@+id/editTextName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/ic_baseline_person_24"
-            android:drawablePadding="5dp"
-            android:hint="@string/user_name"
-            android:textColorHint="@color/white"
-            android:inputType="textPersonName"
-            android:textColor="@color/white"
-            android:drawableStart="@drawable/ic_baseline_person_24" />
-
-        <EditText
-            android:id="@+id/editTextAddress"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/ic_baseline_house_24"
-            android:drawablePadding="5dp"
-            android:hint="@string/user_address"
-            android:inputType="text"
-            android:textColorHint="@color/white"
-            android:textColor="@color/white"
-            android:drawableStart="@drawable/ic_baseline_house_24" />
-
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/textViewLogin"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/linearLayout"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="15dp"
-        android:lineSpacingExtra="7dp"
-        android:text="@string/user_account_login"
-        android:textAlignment="center"
-        android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
-        android:textColor="@color/white"
-        android:gravity="center_horizontal" />
 
     <Button
         android:id="@+id/buttonSignUp"
@@ -99,7 +61,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="15dp"
         android:background="@color/cardview_dark_background"
-        android:text="@string/user_signup"
+        android:text="@string/user_login"
         android:textAllCaps="false"
         android:textColor="@color/cardview_light_background" />
 

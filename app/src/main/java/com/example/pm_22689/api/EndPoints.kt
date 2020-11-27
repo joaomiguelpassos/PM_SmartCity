@@ -9,6 +9,6 @@ interface EndPoints {
     fun getUserById(@Path("id") id: Int): Call<User>
 
     @FormUrlEncoded
-    @POST("/myslim/api/adduser")
-    fun addUser(@Field("id") id: Int?, @Field("name") name: String?, @Field("email") email: String?, @Field("password") password: String?, @Field("address") address: String?): Call<OutputPost>
+    @POST("/myslim/api/userlogin")
+    fun login(@Field("email") email: String?, @Field("password") password: String?): Call<OutputPost>
 }

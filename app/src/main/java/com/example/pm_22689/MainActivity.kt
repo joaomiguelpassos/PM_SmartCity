@@ -23,9 +23,6 @@ import retrofit2.Response
 class MainActivity : AppCompatActivity() {
     private lateinit var editTextEmail: EditText
     private lateinit var editTextPassword: EditText
-    private lateinit var editTextName: EditText
-    private lateinit var editTextAddress: EditText
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,8 +30,6 @@ class MainActivity : AppCompatActivity() {
 
         editTextEmail = findViewById(R.id.editTextEmail)
         editTextPassword = findViewById(R.id.editTextPassword)
-        editTextName = findViewById(R.id.editTextName)
-        editTextAddress = findViewById(R.id.editTextAddress)
 
         findViewById<Button>(R.id.buttonSignUp).setOnClickListener{
             userSignup()
@@ -44,8 +39,6 @@ class MainActivity : AppCompatActivity() {
     fun userSignup(){
         val email = editTextEmail.text.toString().trim { it <= ' ' }
         val password = editTextPassword.text.toString().trim { it <= ' ' }
-        val name = editTextName.text.toString().trim { it <= ' ' }
-        val address: String = editTextAddress.getText().toString().trim { it <= ' ' }
 
         if (email.isEmpty()) {
             editTextEmail.error = "Email is required"
@@ -71,27 +64,18 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        if (name.isEmpty()) {
-            editTextName.error = "Name required"
-            editTextName.requestFocus()
-            return
-        }
-
-        if (address.isEmpty()) {
-            editTextAddress.error = "Address required"
-            editTextAddress.requestFocus()
-            return
-        }
         val request = ServiceBuilder.buildService(EndPoints::class.java)
-        val call = request.addUser(null ,name, email, password, address)
-
+        val call = request.login(email, password)
         call.enqueue(object : Callback<OutputPost> {
             override fun onResponse(call: Call<OutputPost>, response: Response<OutputPost>) {
                 if (response.isSuccessful) {
-                    val c: OutputPost = response.body()!!       // variavel que contem o user em gson
-                    Toast.makeText(this@MainActivity,"Sucesso!",Toast.LENGTH_SHORT).show()
+                    val resp: OutputPost = response.body()!!
+                    Toast.makeText(this@MainActivity, resp.MSG, Toast.LENGTH_SHORT).show()
+
+                    // TODO: 27/11/2020 start atividade mapa
                 }
             }
+
             override fun onFailure(call: Call<OutputPost>, t: Throwable) {
                 Toast.makeText(this@MainActivity, "Erro", Toast.LENGTH_SHORT).show()
             }
