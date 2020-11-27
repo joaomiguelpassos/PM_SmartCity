@@ -51,19 +51,19 @@ class MainActivity : AppCompatActivity() {
         val encryptedPassword: String? = encrypt(password,secretKey)
 
         if (email.isEmpty()) {
-            editTextEmail.error = "Email is required"
+            editTextEmail.error = R.string.email_empty.toString()
             editTextEmail.requestFocus()
             return
         }
 
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            editTextEmail.error = "Enter a valid email"
+            editTextEmail.error = R.string.email_valid.toString()
             editTextEmail.requestFocus()
             return
         }
 
         if (password.isEmpty()) {
-            editTextPassword.error = "Password required"
+            editTextPassword.error = R.string.password_empty.toString()
             editTextPassword.requestFocus()
             return
         }
@@ -87,7 +87,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<OutputPost>, t: Throwable) {
-                Toast.makeText(this@MainActivity, "Erro", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, R.string.response_failure.toString(), Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -110,7 +110,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun encrypt(strToEncrypt: String, secret_key: String): String? {
+    private fun encrypt(strToEncrypt: String, secret_key: String): String? {
         Security.addProvider(BouncyCastleProvider())
         var keyBytes: ByteArray
 

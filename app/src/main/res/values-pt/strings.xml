@@ -19,4 +19,8 @@
     <string name="user_account_login">Já tem uma conta? Clique para entrar</string>
     <string name="user_login">Entrar</string>
     <string name="password_lenght">A password deve contem pelo menos 6 caracteres</string>
+    <string name="email_empty">Introduza o e-mail</string>
+    <string name="email_valid">Introduza um e-mail válido</string>
+    <string name="password_empty">Insira a password</string>
+    <string name="response_failure">Não foi possível contactar a base de dados</string>
 </resources>
