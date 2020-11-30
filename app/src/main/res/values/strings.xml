@@ -2,7 +2,7 @@
     <string name="app_name">Smart City</string>
     <string name="menu_notes">Notes</string>
     <string name="create_new_note">Create</string>
-    <string name="view_notes">View</string>
+    <string name="view_notes">View notes</string>
     <string name="add_note">Add Note</string>
     <string name="welcome">Welcome!</string>
     <string name="button_save">Save</string>
@@ -22,4 +22,15 @@
     <string name="email_valid">Enter a valid e-mail</string>
     <string name="password_empty">Password is required</string>
     <string name="response_failure">Something went wrong with the database</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="preference_file" translatable="false">IsUserLoggedIn</string>
+    <string name="loggedin" translatable="false">true</string>
+    <string name="normal_map">Normal map</string>
+    <string name="hybrid_map">Hybrid map</string>
+    <string name="satellite_map">Satellite map</string>
+    <string name="terrain_map">Terrain map</string>
+    <string name="lat_long_snippet" translatable="false">Lat: %1$.5f, Long: %2$.5f</string>
+    <string name="dropped_pin">Dropped Pin</string>
+    <string name="poi" translatable="false">poi</string>
+    <string name="logout">Logout</string>
 </resources>

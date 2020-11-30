@@ -3,7 +3,7 @@
     <string name="app_name">Smart City</string>
     <string name="menu_notes">Notas</string>
     <string name="create_new_note">Criar</string>
-    <string name="view_notes">Consultar</string>
+    <string name="view_notes">Consultar notas</string>
     <string name="add_note">Adicionar Nota</string>
     <string name="welcome">Bem-vindo!</string>
     <string name="button_save">Guardar</string>
@@ -23,4 +23,11 @@
     <string name="email_valid">Introduza um e-mail válido</string>
     <string name="password_empty">Insira a password</string>
     <string name="response_failure">Não foi possível contactar a base de dados</string>
+    <string name="title_activity_maps">Mapa</string>
+    <string name="normal_map">Mapa normal</string>
+    <string name="hybrid_map">Mapa híbrido</string>
+    <string name="satellite_map">Mapa satélite</string>
+    <string name="terrain_map">Mapa terreno</string>
+    <string name="dropped_pin">Ponto marcado</string>
+    <string name="logout">Logout</string>
 </resources>

@@ -1,7 +1,9 @@
 package com.example.pm_22689
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.util.Patterns
 import android.view.Menu
 import android.view.MenuInflater
@@ -26,9 +28,9 @@ import javax.crypto.*
 import javax.crypto.spec.SecretKeySpec
 
 /**
- * Activity that prompts the login menu to user if never logged in or last session logged out
+ * Activity that prompts the login menu
  */
-class MainActivity : AppCompatActivity() {
+class LoginActivity : AppCompatActivity() {
     private lateinit var editTextEmail: EditText
     private lateinit var editTextPassword: EditText
     private val secretKey: String = "662ede816988e58fb6d057d9d85605e0"
@@ -36,10 +38,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         editTextEmail = findViewById(R.id.editTextEmail)
         editTextPassword = findViewById(R.id.editTextPassword)
-
         findViewById<Button>(R.id.buttonSignUp).setOnClickListener{
             userLogin()
         }
@@ -49,6 +49,8 @@ class MainActivity : AppCompatActivity() {
         val email = editTextEmail.text.toString().trim { it <= ' ' }
         val password = editTextPassword.text.toString().trim { it <= ' ' }
         val encryptedPassword: String? = encrypt(password,secretKey)
+        val intentmap = Intent(this, MapsActivity::class.java)
+        val sharedPref = getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE)
 
         if (email.isEmpty()) {
             editTextEmail.error = R.string.email_empty.toString()
@@ -73,23 +75,30 @@ class MainActivity : AppCompatActivity() {
             editTextPassword.requestFocus()
             return
         }
-
         val request = ServiceBuilder.buildService(EndPoints::class.java)
         val call = request.login(email, encryptedPassword)
         call.enqueue(object : Callback<OutputPost> {
             override fun onResponse(call: Call<OutputPost>, response: Response<OutputPost>) {
                 if (response.isSuccessful) {
                     val resp: OutputPost = response.body()!!
-                    Toast.makeText(this@MainActivity, resp.MSG, Toast.LENGTH_SHORT).show()
-
-                    // TODO: 27/11/2020 start atividade mapa
+                    Toast.makeText(this@LoginActivity, resp.MSG, Toast.LENGTH_SHORT).show()
+                    if(resp.status){
+                        with (sharedPref.edit()) {
+                            putBoolean(getString(R.string.loggedin), true)
+                            commit()
+                        }
+                        Log.d("****SHAREDPREF", "Login pref changed to true")
+                        startActivity(intentmap)
+                    }
                 }
             }
 
             override fun onFailure(call: Call<OutputPost>, t: Throwable) {
-                Toast.makeText(this@MainActivity, R.string.response_failure.toString(), Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@LoginActivity, R.string.response_failure.toString(), Toast.LENGTH_SHORT).show()
             }
         })
+
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

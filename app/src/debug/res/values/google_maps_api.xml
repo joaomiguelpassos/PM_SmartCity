@@ -1,0 +1,16 @@
+<resources>
+    <!--
+    Package name:
+    com.example.pm_22689
+
+    SHA-1 certificate fingerprint:
+    7C:36:63:0C:44:A7:FD:DF:AB:0B:8D:F9:7C:C9:4E:C5:41:F9:0E:47
+
+    Alternatively, follow the directions here:
+    https://developers.google.com/maps/documentation/android/start#get-key
+
+    Once you have your key (it starts with "AIza"), replace the "google_maps_key"
+    string in this file.
+    -->
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyAQfGyktYoIwwnRXvkKVR64DywV1pSAr9A</string>
+</resources>
