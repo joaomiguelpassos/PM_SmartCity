@@ -20,9 +20,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val sharedPref = getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE)
+        val sharedPref =
+            getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE)
         // Lê das Shared Prefs se o utilizador já fez login e se não, inícia a atividade do login
-        if(!sharedPref.getBoolean(getString(R.string.loggedin),false)){
+        if (!sharedPref.getBoolean(getString(R.string.loggedin), false)) {
             val intentlogin = Intent(this, LoginActivity::class.java)
             startActivity(intentlogin)
         }
@@ -46,7 +47,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         map = googleMap
         val latitude = 41.694200468850426
         val longitude = -8.846512287814242
-        val homeLatLng = LatLng(latitude,longitude)
+        val homeLatLng = LatLng(latitude, longitude)
 
         /**
          * Zoom level:
@@ -60,11 +61,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(homeLatLng, zoomLevel))
         map.addMarker(MarkerOptions().position(homeLatLng))
 
+        setMapLongClick(map)
+    }
 
-        // Add a marker in Sydney and move the camera
-        /*val sydney = LatLng(-34.0, 151.0)
-        map.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        map.moveCamera(CameraUpdateFactory.newLatLng(sydney))*/
+    private fun setMapLongClick(map: GoogleMap) {
+        map.setOnMapLongClickListener { latLng ->
+            map.addMarker(MarkerOptions().position(latLng))
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -92,8 +95,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             true
         }
         R.id.logout -> {
-            val sharedPref = getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE)
-            with (sharedPref.edit()) {
+            val sharedPref =
+                getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE)
+            with(sharedPref.edit()) {
                 putBoolean(getString(com.example.pm_22689.R.string.loggedin), false)
                 commit()
             }
@@ -109,6 +113,4 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
         else -> super.onOptionsItemSelected(item)
     }
-
-
 }
