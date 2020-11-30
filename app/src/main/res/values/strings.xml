@@ -33,4 +33,5 @@
     <string name="dropped_pin">Dropped Pin</string>
     <string name="poi" translatable="false">poi</string>
     <string name="logout">Logout</string>
+    <string name="whereami">Where am I?</string>
 </resources>

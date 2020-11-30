@@ -5,22 +5,6 @@
         android:id="@+id/mapnotes"
         android:title="@string/view_notes"/>
     <item
-        android:id="@+id/normal_map"
-        android:title="@string/normal_map"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/hybrid_map"
-        android:title="@string/hybrid_map"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/satellite_map"
-        android:title="@string/satellite_map"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/terrain_map"
-        android:title="@string/terrain_map"
-        app:showAsAction="never" />
-    <item
         android:id="@+id/logout"
         android:title="@string/logout"/>
 </menu>
