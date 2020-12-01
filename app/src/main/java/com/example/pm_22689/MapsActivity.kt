@@ -12,10 +12,8 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import com.example.pm_22689.api.EndPoints
 import com.example.pm_22689.api.Marker
-import com.example.pm_22689.api.OutputPost
 import com.example.pm_22689.api.ServiceBuilder
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -35,7 +33,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var map: GoogleMap
     private val REQUEST_LOCATION_PERMISSION = 1
-    private lateinit var lastLocation: Location
+    private var locationPermissionGranted = false
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var markers: List<Marker>
 
@@ -48,6 +46,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             val intentlogin = Intent(this, LoginActivity::class.java)
             startActivity(intentlogin)
         } else {
+
             setContentView(R.layout.activity_maps)
             // Obtain the SupportMapFragment and get notified when the map is ready to be used.
             val mapFragment =
@@ -101,15 +100,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     }
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
         val latitude = 41.694200468850426
@@ -179,16 +169,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             )
             return
         }
-        map.isMyLocationEnabled = true              // localização em tempo real
-
-        fusedLocationClient.lastLocation.addOnSuccessListener(this) { location ->               //Last location listener
-            if (location != null) {
-                lastLocation = location
-                val currentLatLng = LatLng(location.latitude, location.longitude)
-                map.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 12f))
-            }
-        }
-
+        map.isMyLocationEnabled = true              // enables the blue dot representing the user location
+        locationPermissionGranted = true
     }
 
     override fun onRequestPermissionsResult(
@@ -229,9 +211,41 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             true
         }
         R.id.addMarker -> {
-            // TODO: 01/12/2020 receive data from db and call addMarker 
+            getDeviceLocation()
             true
         }
         else -> super.onOptionsItemSelected(item)
+    }
+
+    private fun getDeviceLocation() {
+        /*
+         * Get the best and most recent location of the device, which may be null in rare
+         * cases when a location is not available.
+         * https://github.com/googlemaps/android-samples/blob/29ca74b9a3894121f179b9f36b0a51755e7231b0/tutorials/kotlin/CurrentPlaceDetailsOnMap/app/src/main/java/com/example/currentplacedetailsonmap/MapsActivityCurrentPlace.kt#L193-L222
+         */
+        try {
+            if (locationPermissionGranted) {
+                val locationResult = fusedLocationClient.lastLocation
+                locationResult.addOnCompleteListener(this) { task ->
+                    if (task.isSuccessful) {
+                        var location = task.result
+                        if (location != null) {
+                            map.addMarker(
+                                MarkerOptions()
+                                    .position(LatLng(location.latitude,location.longitude))
+                                    .title(getString(R.string.dropped_pin))
+                                    .icon( // para mudar a cor do marker para azul
+                                        BitmapDescriptorFactory.defaultMarker(
+                                            BitmapDescriptorFactory.HUE_BLUE
+                                        )
+                                    )
+                            )
+                        }
+                    }
+                }
+            }
+        } catch (e: SecurityException) {
+            Log.e("Exception: %s", e.message, e)
+        }
     }
 }
