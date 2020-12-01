@@ -23,7 +23,7 @@
     <string name="password_empty">Password is required</string>
     <string name="response_failure">Something went wrong with the database</string>
     <string name="title_activity_maps">Map</string>
-    <string name="preference_file" translatable="false">IsUserLoggedIn</string>
+    <string name="preference_file" translatable="false">isUserLoggedIn</string>
     <string name="loggedin" translatable="false">true</string>
     <string name="normal_map">Normal map</string>
     <string name="hybrid_map">Hybrid map</string>
@@ -34,4 +34,5 @@
     <string name="poi" translatable="false">poi</string>
     <string name="logout">Logout</string>
     <string name="whereami">Where am I?</string>
+    <string name="addMarker">Add marker</string>
 </resources>

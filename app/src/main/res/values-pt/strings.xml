@@ -31,4 +31,5 @@
     <string name="dropped_pin">Ponto marcado</string>
     <string name="logout">Logout</string>
     <string name="whereami">Onde estou?</string>
+    <string name="addMarker">Adicionar ponto</string>
 </resources>

@@ -172,6 +172,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             startActivity(intentnotes)
             true
         }
+        R.id.addMarker -> {
+            // TODO: 01/12/2020 receive data from db and call addMarker 
+            true
+        }
         else -> super.onOptionsItemSelected(item)
     }
 }
