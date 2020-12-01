@@ -17,4 +17,15 @@ interface EndPoints {
     @FormUrlEncoded
     @POST("/myslim/api/userlogin")
     fun login(@Field("email") email: String?, @Field("password") password: String?): Call<OutputPost>
+
+    /**
+     * Sends coords to insert on DB
+     */
+    @FormUrlEncoded
+    @POST("/myslim/api/addMarker")
+    fun saveMarker(@Field("idUser") id: Int,
+                   @Field("latitude") lat: String,
+                   @Field("longitude") lon: String,
+                   @Field("tipo") tipo: String): Call<Marker>
+
 }

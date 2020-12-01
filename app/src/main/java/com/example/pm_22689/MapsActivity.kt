@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -17,7 +16,6 @@ import com.example.pm_22689.api.Marker
 import com.example.pm_22689.api.ServiceBuilder
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
@@ -39,11 +37,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val sharedPref =
-            getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE)
+        val sharedPref = getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE)
         // Lê das Shared Prefs se o utilizador já fez login e se não, inícia a atividade do login
         if (!sharedPref.getBoolean(getString(R.string.loggedin), false)) {
             val intentlogin = Intent(this, LoginActivity::class.java)
+            intentlogin.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
+            intentlogin.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intentlogin)
         } else {
 
@@ -169,7 +168,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             )
             return
         }
-        map.isMyLocationEnabled = true              // enables the blue dot representing the user location
+        map.isMyLocationEnabled = true              // enables the blue dot representing the user location (My Location Layer)
         locationPermissionGranted = true
     }
 
@@ -211,13 +210,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             true
         }
         R.id.addMarker -> {
-            getDeviceLocation()
+            markCurrentLocation()
             true
         }
         else -> super.onOptionsItemSelected(item)
     }
 
-    private fun getDeviceLocation() {
+    private fun markCurrentLocation() {
         /*
          * Get the best and most recent location of the device, which may be null in rare
          * cases when a location is not available.
@@ -240,6 +239,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                                         )
                                     )
                             )
+                            saveMarker(location.latitude,location.longitude,getString(R.string.dropped_pin))
                         }
                     }
                 }
@@ -247,5 +247,29 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         } catch (e: SecurityException) {
             Log.e("Exception: %s", e.message, e)
         }
+    }
+
+    fun saveMarker(latitude: Double, longitude: Double, tipo: String) {
+        val sharedPref =
+            getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE)
+        var id = sharedPref.getInt("id", 0)
+
+        val request = ServiceBuilder.buildService(EndPoints::class.java)
+        val call = request.saveMarker(id,latitude.toString(),longitude.toString(),tipo)
+        var position: LatLng
+        call.enqueue(object : Callback<Marker> {
+            override fun onResponse(
+                call: Call<Marker>,
+                response: Response<Marker>
+            ) {
+                if (response.isSuccessful) {
+                    Toast.makeText(this@MapsActivity,"Marker saved",Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<Marker>, t: Throwable) {
+                Toast.makeText(this@MapsActivity,"Marker not saved",Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 }
