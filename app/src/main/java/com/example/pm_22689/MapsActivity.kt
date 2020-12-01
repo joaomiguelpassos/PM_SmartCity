@@ -249,7 +249,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    fun saveMarker(latitude: Double, longitude: Double, tipo: String) {
+    private fun saveMarker(latitude: Double, longitude: Double, tipo: String) {
         val sharedPref =
             getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE)
         var id = sharedPref.getInt("id", 0)
