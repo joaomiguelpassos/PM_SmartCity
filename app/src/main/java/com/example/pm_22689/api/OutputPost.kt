@@ -11,3 +11,10 @@ data class User(
     val email: String,
     val password: String
 )
+
+data class Marker(
+    val id: Int,
+    val lat: Double,
+    val lon: Double,
+    val tipo: String
+)
