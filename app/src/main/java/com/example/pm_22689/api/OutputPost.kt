@@ -13,8 +13,8 @@ data class User(
 )
 
 data class Marker(
-    val id: Int,
-    val lat: Double,
-    val lon: Double,
+    val idUser: Int,
+    val latitude: String,
+    val longitude: String,
     val tipo: String
 )

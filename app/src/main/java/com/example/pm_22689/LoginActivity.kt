@@ -85,9 +85,11 @@ class LoginActivity : AppCompatActivity() {
                     if(resp.status){
                         with (sharedPref.edit()) {
                             putBoolean(getString(R.string.loggedin), true)
+                            putInt("id",resp.data.id)
                             commit()
                         }
-                        Log.d("****SHAREDPREF", "Login pref changed to true")
+                        Log.d("****SHAREDPREF", "Logged in changed to true")
+                        Log.d("****SHAREDPREF", "ID saved: ${resp.data.id}")
                         startActivity(intentmap)
                     }
                 }

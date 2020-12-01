@@ -13,7 +13,10 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.example.pm_22689.api.EndPoints
 import com.example.pm_22689.api.Marker
+import com.example.pm_22689.api.OutputPost
+import com.example.pm_22689.api.ServiceBuilder
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -23,6 +26,9 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.util.*
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -41,13 +47,57 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         if (!sharedPref.getBoolean(getString(R.string.loggedin), false)) {
             val intentlogin = Intent(this, LoginActivity::class.java)
             startActivity(intentlogin)
-        }
-        setContentView(R.layout.activity_maps)
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
-        mapFragment.getMapAsync(this)
+        } else {
+            setContentView(R.layout.activity_maps)
+            // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+            val mapFragment =
+                supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
+            mapFragment.getMapAsync(this)
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+            fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+            val request = ServiceBuilder.buildService(EndPoints::class.java)
+            val call = request.getMarkers()
+            var position: LatLng
+            call.enqueue(object : Callback<List<Marker>> {
+                override fun onResponse(
+                    call: Call<List<Marker>>,
+                    response: Response<List<Marker>>
+                ) {
+                    if (response.isSuccessful) {
+                        markers = response.body()!!
+                        Log.d("****GET", "$markers")
+                        for (marker in markers) {
+                            position = LatLng(marker.latitude.toString().toDouble(), marker.longitude.toString().toDouble())
+                            if (marker.idUser == sharedPref.getInt("id", 0)) {
+                                map.addMarker(
+                                    MarkerOptions()
+                                        .position(position)
+                                        .title(marker.tipo)
+                                        .icon( // para mudar a cor do marker para azul
+                                            BitmapDescriptorFactory.defaultMarker(
+                                                BitmapDescriptorFactory.HUE_BLUE
+                                            )
+                                        )
+                                )
+                            } else {
+                                map.addMarker(
+                                    MarkerOptions()
+                                        .position(position)
+                                        .title(marker.tipo)
+                                    )
+                            }
+                        }
+                    }
+                }
+
+                override fun onFailure(call: Call<List<Marker>>, t: Throwable) {
+                    Toast.makeText(this@MapsActivity, "Something went wrong...", Toast.LENGTH_LONG)
+                        .show()
+                    Log.d("****MAP", "failure")
+                }
+            })
+        }
 
     }
 
@@ -114,9 +164,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun enableMyLocation() {
-        if (ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf<String>(Manifest.permission.ACCESS_FINE_LOCATION),
@@ -129,7 +184,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         fusedLocationClient.lastLocation.addOnSuccessListener(this) { location ->               //Last location listener
             if (location != null) {
                 lastLocation = location
-                val currentLatLng = LatLng (location.latitude, location.longitude)
+                val currentLatLng = LatLng(location.latitude, location.longitude)
                 map.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 12f))
             }
         }

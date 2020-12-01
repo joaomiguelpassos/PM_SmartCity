@@ -8,8 +8,8 @@ interface EndPoints {
     /**
      * Gets all markers from WS REST
      */
-    @GET("/api/markers")
-    fun getMarkers(): Call<Marker>
+    @GET("/myslim/api/markers")
+    fun getMarkers(): Call<List<Marker>>
 
     /**
      * Sends email and password to DB in order to check if they match a record
