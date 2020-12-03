@@ -141,7 +141,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             } else {
                 marker.showInfoWindow()
             }
-            // TODO: 03/12/2020 prompt update or delete to user and POST it to WS 
+            // TODO: 03/12/2020 prompt update or delete to user and POST it to WS
             true
         }
     }
@@ -261,7 +261,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         val request = ServiceBuilder.buildService(EndPoints::class.java)
         val call = request.saveMarker(id,latitude.toString(),longitude.toString(),tipo)
-        var position: LatLng
         call.enqueue(object : Callback<Marker> {
             override fun onResponse(
                 call: Call<Marker>,
