@@ -101,10 +101,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
-        val latitude = 41.694200468850426
-        val longitude = -8.846512287814242
-        val homeLatLng = LatLng(latitude, longitude)
-
         /**
          * Zoom level:
          *  1: World
@@ -113,11 +109,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
          * 15: Streets
          * 20: Buildings
          */
-        val zoomLevel = 15f
-        //map.moveCamera(CameraUpdateFactory.newLatLngZoom(homeLatLng, zoomLevel))
-        //map.addMarker(MarkerOptions().position(homeLatLng))
-
         setMapLongClick(map)
+        setMarkerClick(map)
         enableMyLocation()
         //setPoiClick(map)
     }
@@ -138,6 +131,18 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     .snippet(snippet)
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)) // para mudar a cor do marker para azul
             )
+        }
+    }
+
+    private fun setMarkerClick(map: GoogleMap) {
+        map.setOnMarkerClickListener { marker ->
+            if (marker.isInfoWindowShown) {
+                marker.hideInfoWindow()
+            } else {
+                marker.showInfoWindow()
+            }
+            // TODO: 03/12/2020 prompt update or delete to user and POST it to WS 
+            true
         }
     }
 
