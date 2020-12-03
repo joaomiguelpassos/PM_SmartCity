@@ -263,12 +263,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 response: Response<Marker>
             ) {
                 if (response.isSuccessful) {
-                    Toast.makeText(this@MapsActivity,"Marker saved",Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MapsActivity, "Marker saved", Toast.LENGTH_SHORT).show()
+                    // TODO: 03/12/2020 ask marker type to user in order to save it
                 }
             }
 
             override fun onFailure(call: Call<Marker>, t: Throwable) {
-                Toast.makeText(this@MapsActivity,"Marker not saved",Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MapsActivity, "Marker not saved", Toast.LENGTH_SHORT).show()
             }
         })
     }
