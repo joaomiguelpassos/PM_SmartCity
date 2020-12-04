@@ -11,9 +11,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
-import com.example.pm_22689.api.EndPoints
-import com.example.pm_22689.api.Marker
-import com.example.pm_22689.api.ServiceBuilder
+import com.example.pm_22689.api.*
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.GoogleMap
@@ -34,10 +32,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private var locationPermissionGranted = false
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var markers: List<Marker>
+    private var deleteSelectedMarker = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val sharedPref = getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE)
+        val sharedPref =
+            getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE)
         // Lê das Shared Prefs se o utilizador já fez login e se não, inícia a atividade do login
         if (!sharedPref.getBoolean(getString(R.string.loggedin), false)) {
             val intentlogin = Intent(this, LoginActivity::class.java)
@@ -66,9 +66,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         markers = response.body()!!
                         Log.d("****GET", "$markers")
                         for (marker in markers) {
-                            position = LatLng(marker.latitude.toString().toDouble(), marker.longitude.toString().toDouble())
+                            position = LatLng(
+                                marker.latitude.toString().toDouble(),
+                                marker.longitude.toString().toDouble()
+                            )
                             if (marker.idUser == sharedPref.getInt("id", 0)) {
-                                map.addMarker(
+                                var userMarker = map.addMarker(
                                     MarkerOptions()
                                         .position(position)
                                         .title(marker.tipo)
@@ -78,12 +81,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                                             )
                                         )
                                 )
+                                userMarker.tag = "0&${marker.id}"
                             } else {
-                                map.addMarker(
+                                var newMarker = map.addMarker(
                                     MarkerOptions()
                                         .position(position)
                                         .title(marker.tipo)
-                                    )
+                                )
+                                newMarker.tag = "1&${marker.id}"
                             }
                         }
                     }
@@ -141,7 +146,35 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             } else {
                 marker.showInfoWindow()
             }
-            // TODO: 03/12/2020 prompt update or delete to user and POST it to WS
+            if (deleteSelectedMarker) {
+                var splitTag: String = marker.tag.toString()
+                var tagID = splitTag.split("&").toTypedArray()
+                if (tagID[0].toInt() == 0) {
+                    marker.remove()
+                    deleteSelectedMarker = false
+
+                    val request = ServiceBuilder.buildService(EndPoints::class.java)
+                    val call = request.deleteMarker(tagID[1].toInt())
+                    call.enqueue(object : Callback<ResponseDelete> {
+                        override fun onResponse(call: Call<ResponseDelete>, response: Response<ResponseDelete>) {
+                            if (response.isSuccessful) {
+                                var resp: ResponseDelete = response.body()!!
+                                if(resp.status){
+                                    Toast.makeText(this@MapsActivity, R.string.markerDeleted, Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
+
+                        override fun onFailure(call: Call<ResponseDelete>, t: Throwable) {
+                            TODO("Not yet implemented")
+                        }
+
+
+                    })
+                } else {
+                    Toast.makeText(this, R.string.markerNotFromUser, Toast.LENGTH_SHORT).show()
+                }
+            }
             true
         }
     }
@@ -173,22 +206,18 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             )
             return
         }
-        map.isMyLocationEnabled = true              // enables the blue dot representing the user location (My Location Layer)
+        map.isMyLocationEnabled =
+            true              // enables the blue dot representing the user location (My Location Layer)
         locationPermissionGranted = true
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    ) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         if (requestCode == REQUEST_LOCATION_PERMISSION) {
             if (grantResults.contains(PackageManager.PERMISSION_GRANTED)) {
                 enableMyLocation()
             }
         }
     }
-
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater = menuInflater
@@ -218,6 +247,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             markCurrentLocation()
             true
         }
+        R.id.deleteMarker -> {
+            deleteSelectedMarker = true
+            Toast.makeText(this, R.string.selectMarkerToDelete, Toast.LENGTH_SHORT).show()
+            true
+        }
         else -> super.onOptionsItemSelected(item)
     }
 
@@ -236,7 +270,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         if (location != null) {
                             map.addMarker(
                                 MarkerOptions()
-                                    .position(LatLng(location.latitude,location.longitude))
+                                    .position(LatLng(location.latitude, location.longitude))
                                     .title(getString(R.string.dropped_pin))
                                     .icon( // para mudar a cor do marker para azul
                                         BitmapDescriptorFactory.defaultMarker(
@@ -244,7 +278,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                                         )
                                     )
                             )
-                            saveMarker(location.latitude,location.longitude,getString(R.string.dropped_pin))
+                            saveMarker(
+                                location.latitude,
+                                location.longitude,
+                                getString(R.string.dropped_pin)
+                            )
                         }
                     }
                 }
@@ -260,12 +298,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         var id = sharedPref.getInt("id", 0)
 
         val request = ServiceBuilder.buildService(EndPoints::class.java)
-        val call = request.saveMarker(id,latitude.toString(),longitude.toString(),tipo)
+        val call = request.saveMarker(id, latitude.toString(), longitude.toString(), tipo)
         call.enqueue(object : Callback<Marker> {
-            override fun onResponse(
-                call: Call<Marker>,
-                response: Response<Marker>
-            ) {
+            override fun onResponse(call: Call<Marker>, response: Response<Marker>) {
                 if (response.isSuccessful) {
                     Toast.makeText(this@MapsActivity, "Marker saved", Toast.LENGTH_SHORT).show()
                     // TODO: 03/12/2020 ask marker type to user in order to save it

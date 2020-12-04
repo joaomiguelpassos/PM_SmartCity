@@ -16,5 +16,11 @@ data class Marker(
     val idUser: Int,
     val latitude: String,
     val longitude: String,
-    val tipo: String
+    val tipo: String,
+    val id: Int
+)
+
+data class ResponseDelete(
+    val status: Boolean,
+    val MSG: String
 )

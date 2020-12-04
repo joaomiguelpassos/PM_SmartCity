@@ -53,25 +53,25 @@ class LoginActivity : AppCompatActivity() {
         val sharedPref = getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE)
 
         if (email.isEmpty()) {
-            editTextEmail.error = R.string.email_empty.toString()
+            editTextEmail.error = getString(R.string.email_empty)
             editTextEmail.requestFocus()
             return
         }
 
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            editTextEmail.error = R.string.email_valid.toString()
+            editTextEmail.error = getString(R.string.email_valid)
             editTextEmail.requestFocus()
             return
         }
 
         if (password.isEmpty()) {
-            editTextPassword.error = R.string.password_empty.toString()
+            editTextPassword.error = getString(R.string.password_empty)
             editTextPassword.requestFocus()
             return
         }
 
         if (password.length < 6) {
-            editTextPassword.error = R.string.password_lenght.toString()
+            editTextPassword.error = getString(R.string.password_lenght)
             editTextPassword.requestFocus()
             return
         }
@@ -96,7 +96,7 @@ class LoginActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<OutputPost>, t: Throwable) {
-                Toast.makeText(this@LoginActivity, R.string.response_failure.toString(), Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@LoginActivity, R.string.response_failure, Toast.LENGTH_SHORT).show()
             }
         })
 

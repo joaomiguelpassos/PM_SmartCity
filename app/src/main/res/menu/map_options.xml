@@ -4,7 +4,13 @@
     <item
         android:id="@+id/addMarker"
         android:title="@string/addMarker"
-        app:showAsAction="always"/>
+        android:icon="@drawable/addmarker"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/deleteMarker"
+        android:title="@string/deleteMarker"
+        android:icon="@drawable/removemarker"
+        app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/mapnotes"
         android:title="@string/view_notes"/>

@@ -23,9 +23,14 @@ interface EndPoints {
      */
     @FormUrlEncoded
     @POST("/myslim/api/addMarker")
-    fun saveMarker(@Field("idUser") id: Int,
+    fun saveMarker(@Field("idUser") idUser: Int,
                    @Field("latitude") lat: String,
                    @Field("longitude") lon: String,
                    @Field("tipo") tipo: String): Call<Marker>
 
+    /**
+     * Deletes a marker with a giver ID
+     */
+    @GET("/myslim/api/deletemarker/{id}")
+    fun deleteMarker(@Path("id") id: Int): Call<ResponseDelete>
 }

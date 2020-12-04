@@ -32,4 +32,8 @@
     <string name="logout">Logout</string>
     <string name="whereami">Onde estou?</string>
     <string name="addMarker">Adicionar ponto</string>
+    <string name="markerDeleted">Ponto apagado</string>
+    <string name="markerNotFromUser">Este ponto não é seu!</string>
+    <string name="deleteMarker">Apagar um ponto</string>
+    <string name="selectMarkerToDelete">Carregue num ponto para apagar</string>
 </resources>
