@@ -36,4 +36,5 @@
     <string name="markerNotFromUser">Este ponto não é seu!</string>
     <string name="deleteMarker">Apagar um ponto</string>
     <string name="selectMarkerToDelete">Carregue num ponto para apagar</string>
+    <string name="markerNotDeleted">Não foi possível apagar o ponto</string>
 </resources>

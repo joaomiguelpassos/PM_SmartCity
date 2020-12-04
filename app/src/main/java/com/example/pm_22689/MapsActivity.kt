@@ -57,6 +57,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             val request = ServiceBuilder.buildService(EndPoints::class.java)
             val call = request.getMarkers()
             var position: LatLng
+            var snippet: String
             call.enqueue(object : Callback<List<Marker>> {
                 override fun onResponse(
                     call: Call<List<Marker>>,
@@ -64,17 +65,23 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 ) {
                     if (response.isSuccessful) {
                         markers = response.body()!!
-                        Log.d("****GET", "$markers")
                         for (marker in markers) {
                             position = LatLng(
                                 marker.latitude.toString().toDouble(),
                                 marker.longitude.toString().toDouble()
+                            )
+                            snippet = String.format(
+                                Locale.getDefault(),
+                                "Lat: %1$.5f, Long: %2$.5f",
+                                marker.latitude.toFloat(),
+                                marker.longitude.toFloat()
                             )
                             if (marker.idUser == sharedPref.getInt("id", 0)) {
                                 var userMarker = map.addMarker(
                                     MarkerOptions()
                                         .position(position)
                                         .title(marker.tipo)
+                                        .snippet(snippet)
                                         .icon( // para mudar a cor do marker para azul
                                             BitmapDescriptorFactory.defaultMarker(
                                                 BitmapDescriptorFactory.HUE_BLUE
@@ -86,6 +93,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                                 var newMarker = map.addMarker(
                                     MarkerOptions()
                                         .position(position)
+                                        .snippet(snippet)
                                         .title(marker.tipo)
                                 )
                                 newMarker.tag = "1&${marker.id}"
@@ -117,7 +125,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         setMapLongClick(map)
         setMarkerClick(map)
         enableMyLocation()
-        //setPoiClick(map)
     }
 
     private fun setMapLongClick(map: GoogleMap) {
@@ -150,43 +157,36 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 var splitTag: String = marker.tag.toString()
                 var tagID = splitTag.split("&").toTypedArray()
                 if (tagID[0].toInt() == 0) {
-                    marker.remove()
-                    deleteSelectedMarker = false
-
                     val request = ServiceBuilder.buildService(EndPoints::class.java)
                     val call = request.deleteMarker(tagID[1].toInt())
                     call.enqueue(object : Callback<ResponseDelete> {
-                        override fun onResponse(call: Call<ResponseDelete>, response: Response<ResponseDelete>) {
+                        override fun onResponse(
+                            call: Call<ResponseDelete>,
+                            response: Response<ResponseDelete>
+                        ) {
                             if (response.isSuccessful) {
                                 var resp: ResponseDelete = response.body()!!
-                                if(resp.status){
-                                    Toast.makeText(this@MapsActivity, R.string.markerDeleted, Toast.LENGTH_SHORT).show()
+                                if (resp.status) {
+                                    marker.remove()
+                                    deleteSelectedMarker = false
+                                    Toast.makeText(
+                                        this@MapsActivity,
+                                        R.string.markerDeleted,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 }
                             }
                         }
 
                         override fun onFailure(call: Call<ResponseDelete>, t: Throwable) {
-                            TODO("Not yet implemented")
+                            Toast.makeText(this@MapsActivity, R.string.markerNotDeleted, Toast.LENGTH_SHORT).show()
                         }
-
-
                     })
                 } else {
                     Toast.makeText(this, R.string.markerNotFromUser, Toast.LENGTH_SHORT).show()
                 }
             }
             true
-        }
-    }
-
-    private fun setPoiClick(map: GoogleMap) {
-        map.setOnPoiClickListener { poi ->
-            val poiMarker = map.addMarker(
-                MarkerOptions()
-                    .position(poi.latLng)
-                    .title(poi.name)
-            )
-            poiMarker.showInfoWindow()
         }
     }
 

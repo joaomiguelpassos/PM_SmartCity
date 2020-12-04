@@ -40,4 +40,5 @@
     <string name="markerNotFromUser">This marker is not yours!</string>
     <string name="deleteMarker">Delete a marker</string>
     <string name="selectMarkerToDelete">Press on a marker to delete it</string>
+    <string name="markerNotDeleted">Something went wrong with deleting</string>
 </resources>
