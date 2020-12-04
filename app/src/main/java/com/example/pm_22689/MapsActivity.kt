@@ -268,7 +268,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     if (task.isSuccessful) {
                         var location = task.result
                         if (location != null) {
-                            map.addMarker(
+                            var userMarker = map.addMarker(
                                 MarkerOptions()
                                     .position(LatLng(location.latitude, location.longitude))
                                     .title(getString(R.string.dropped_pin))
@@ -281,7 +281,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                             saveMarker(
                                 location.latitude,
                                 location.longitude,
-                                getString(R.string.dropped_pin)
+                                getString(R.string.dropped_pin),
+                                userMarker
                             )
                         }
                     }
@@ -292,7 +293,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun saveMarker(latitude: Double, longitude: Double, tipo: String) {
+    private fun saveMarker(latitude: Double, longitude: Double, tipo: String, marker: com.google.android.gms.maps.model.Marker) {
         val sharedPref =
             getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE)
         var id = sharedPref.getInt("id", 0)
@@ -303,7 +304,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             override fun onResponse(call: Call<Marker>, response: Response<Marker>) {
                 if (response.isSuccessful) {
                     Toast.makeText(this@MapsActivity, "Marker saved", Toast.LENGTH_SHORT).show()
-                    // TODO: 03/12/2020 ask marker type to user in order to save it
+                    var resp = response.body()!!
+                    marker.tag = "0&${resp.id}"
                 }
             }
 
