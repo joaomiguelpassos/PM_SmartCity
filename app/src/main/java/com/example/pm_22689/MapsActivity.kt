@@ -37,6 +37,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private var deleteSelectedMarker = false
     private val newMarkerActivityRequestCode = 1
     private val updateMarkerActivityRequestCode = 2
+    private var tempMarker: com.google.android.gms.maps.model.Marker? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -135,6 +136,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
          */
         setMapLongClick(map)
         setMarkerClick(map)
+        onInfoWindowLongClick(map)
         enableMyLocation()
     }
 
@@ -146,6 +148,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             startActivityForResult(intentAddMarker, newMarkerActivityRequestCode)
         }
     }
+
+    private fun onInfoWindowLongClick(map: GoogleMap) {
+        map.setOnInfoWindowLongClickListener {
+            val intentAddMarker = Intent(this@MapsActivity, MarkerDetails::class.java)
+            intentAddMarker.putExtra("latitude", it.position.latitude.toString())
+            intentAddMarker.putExtra("longitude", it.position.longitude.toString())
+            intentAddMarker.putExtra("descr", it.snippet)
+            //it.remove()
+            tempMarker = it
+            startActivityForResult(intentAddMarker, newMarkerActivityRequestCode)
+        }
+    }
+
 
     private fun setMarkerClick(map: GoogleMap) {
         map.setOnMarkerClickListener { marker ->
@@ -320,47 +335,84 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         })
     }
 
+    private fun updateMarker(
+        latitude: Double,
+        longitude: Double,
+        tipo: String,
+        marker: com.google.android.gms.maps.model.Marker,
+        descr: String?
+    ) {
+        val sharedPref =
+            getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE)
+        var id = sharedPref.getInt("id", 0)
+
+        val request = ServiceBuilder.buildService(EndPoints::class.java)
+        val call = request.updateMarker(id, id, latitude.toString(), longitude.toString(), tipo, descr)
+        call.enqueue(object : Callback<Marker> {
+            override fun onResponse(call: Call<Marker>, response: Response<Marker>) {
+                if (response.isSuccessful) {
+                    var resp = response.body()!!
+                    marker.tag = "0&${resp.id}"
+                    Toast.makeText(this@MapsActivity, R.string.markerSaved, Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<Marker>, t: Throwable) {
+                Toast.makeText(this@MapsActivity, R.string.markerNotSaved, Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == newMarkerActivityRequestCode && resultCode == Activity.RESULT_OK) {    //add note
+        if (resultCode == Activity.RESULT_OK) {    //add note
             data?.getStringExtra(MarkerDetails.EXTRA_DATA_DESCR)?.let {
-                    var latitude = data.getStringExtra(MarkerDetails.EXTRA_DATA_LAT)!!.toDouble()
-                    var longitude = data.getStringExtra(MarkerDetails.EXTRA_DATA_LOG)!!.toDouble()
-                    var tipo = data.getStringExtra(MarkerDetails.EXTRA_DATA_TIPO)
-                    var descr = data.getStringExtra(MarkerDetails.EXTRA_DATA_DESCR)
-                    var userMarker: com.google.android.gms.maps.model.Marker
-                    descr = if (!TextUtils.isEmpty(descr)) {
-                        String.format(
-                            Locale.getDefault(),
-                            descr.toString()
-                        )
-                    } else {
-                        String.format(
-                            Locale.getDefault(),
-                            "Lat: %1$.5f, Long: %2$.5f",
-                            latitude.toFloat(),
-                            longitude.toFloat()
-                        )
-                    }
-
-                    userMarker = map.addMarker(
-                        MarkerOptions()
-                            .position(LatLng(latitude, longitude))
-                            .snippet(descr)
-                            .icon( // para mudar a cor do marker para azul
-                                BitmapDescriptorFactory.defaultMarker(
-                                    BitmapDescriptorFactory.HUE_BLUE
-                                )
-                            )
+                var latitude = data.getStringExtra(MarkerDetails.EXTRA_DATA_LAT)!!.toDouble()
+                var longitude = data.getStringExtra(MarkerDetails.EXTRA_DATA_LOG)!!.toDouble()
+                var tipo = data.getStringExtra(MarkerDetails.EXTRA_DATA_TIPO)
+                var descr = data.getStringExtra(MarkerDetails.EXTRA_DATA_DESCR)
+                Log.d("****tag", "onActivityResult: $descr")
+                var userMarker: com.google.android.gms.maps.model.Marker
+                descr = if (!TextUtils.isEmpty(descr)) {
+                    String.format(
+                        Locale.getDefault(),
+                        descr.toString()
                     )
+                } else {
+                    String.format(
+                        Locale.getDefault(),
+                        "Lat: %1$.5f, Long: %2$.5f",
+                        latitude.toFloat(),
+                        longitude.toFloat()
+                    )
+                }
+
+                if (requestCode == newMarkerActivityRequestCode){
                     if (tipo != null) {
+                        tempMarker?.remove()
+                        tempMarker = null
+                        userMarker = map.addMarker(
+                            MarkerOptions()
+                                .position(LatLng(latitude, longitude))
+                                .snippet(descr)
+                                .icon( // para mudar a cor do marker para azul
+                                    BitmapDescriptorFactory.defaultMarker(
+                                        BitmapDescriptorFactory.HUE_BLUE
+                                    )
+                                )
+                        )
                         userMarker.title = tipo
                         saveMarker(latitude, longitude, tipo, userMarker, descr)
                     }
-            }
-        } else if (requestCode == updateMarkerActivityRequestCode && resultCode == Activity.RESULT_OK) { //update note
-            data?.getStringExtra(MarkerDetails.EXTRA_DATA_DESCR)?.let {
+                } else if (requestCode == updateMarkerActivityRequestCode){
+                    if (tipo != null) {
+                        tempMarker!!.title = tipo
+                        tempMarker!!.snippet = descr
+                        tempMarker!!.hideInfoWindow()
+                        updateMarker(latitude, longitude, tipo, tempMarker!!, descr)
+                    }
+                }
 
             }
         } else {

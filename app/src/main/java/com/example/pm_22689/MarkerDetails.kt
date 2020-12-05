@@ -30,6 +30,10 @@ class MarkerDetails : AppCompatActivity() {
             latitude = intent.getStringExtra("latitude").toString()
             longitude = intent.getStringExtra("longitude").toString()
             coordsText.text = "Lat: $latitude | Long: $longitude"
+            descr = intent.getStringExtra("descr").toString()
+            descrText.setText(descr)              // sets the text of the EditText with the intent content
+            descrText.setSelection(descr.length)
+            descrText.requestFocus()             // puts the cursor at the end of the text
         }
 
         if (spinner != null) {

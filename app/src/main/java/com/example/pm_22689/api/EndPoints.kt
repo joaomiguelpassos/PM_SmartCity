@@ -28,12 +28,26 @@ interface EndPoints {
         @Field("latitude") lat: String,
         @Field("longitude") lon: String,
         @Field("tipo") tipo: String,
-        @Field("descr")descr: String?
+        @Field("descricao") descr: String?
     ): Call<Marker>
 
     /**
-     * Deletes a marker with a giver ID
+     * Deletes a marker with a given ID
      */
     @GET("/myslim/api/deletemarker/{id}")
     fun deleteMarker(@Path("id") id: Int): Call<ResponseDelete>
+
+    /**
+     * Updates a marker with a given ID
+     */
+    @FormUrlEncoded
+    @POST("/myslim/api/updateMarker/{id}")
+    fun updateMarker(
+        @Field("id") id: Int,
+        @Field("idUser") idUser: Int,
+        @Field("latitude") lat: String,
+        @Field("longitude") lon: String,
+        @Field("tipo") tipo: String,
+        @Field("descricao") descr: String?,
+    ): Call<Marker>
 }
