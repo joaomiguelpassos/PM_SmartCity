@@ -37,4 +37,11 @@
     <string name="deleteMarker">Apagar um ponto</string>
     <string name="selectMarkerToDelete">Carregue num ponto para apagar</string>
     <string name="markerNotDeleted">Não foi possível apagar o ponto</string>
+    <string name="textTipo">Tipo:</string>
+    <string name="textCoords">Coords:</string>
+    <string name="textDescr">Descrição:</string>
+    <string name="emptyTextView">Nada para mostrar</string>
+    <string name="markerSaved">Ponto guardado</string>
+    <string name="markerNotSaved">Erro ao guardar</string>
+    <string name="markerDescHint">Descreva o problema</string>
 </resources>

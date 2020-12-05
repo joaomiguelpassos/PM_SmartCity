@@ -1,11 +1,13 @@
 package com.example.pm_22689
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.TextUtils
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -33,6 +35,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var markers: List<Marker>
     private var deleteSelectedMarker = false
+    private val newMarkerActivityRequestCode = 1
+    private val updateMarkerActivityRequestCode = 2
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,15 +71,22 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         markers = response.body()!!
                         for (marker in markers) {
                             position = LatLng(
-                                marker.latitude.toString().toDouble(),
-                                marker.longitude.toString().toDouble()
+                                marker.latitude.toDouble(),
+                                marker.longitude.toDouble()
                             )
-                            snippet = String.format(
-                                Locale.getDefault(),
-                                "Lat: %1$.5f, Long: %2$.5f",
-                                marker.latitude.toFloat(),
-                                marker.longitude.toFloat()
-                            )
+                            snippet = if (marker.descricao != null) {
+                                String.format(
+                                    Locale.getDefault(),
+                                    marker.descricao.toString()
+                                )
+                            } else {
+                                String.format(
+                                    Locale.getDefault(),
+                                    "Lat: %1$.5f, Long: %2$.5f",
+                                    marker.latitude.toFloat(),
+                                    marker.longitude.toFloat()
+                                )
+                            }
                             if (marker.idUser == sharedPref.getInt("id", 0)) {
                                 var userMarker = map.addMarker(
                                     MarkerOptions()
@@ -129,20 +140,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun setMapLongClick(map: GoogleMap) {
         map.setOnMapLongClickListener { latLng ->
-            // A snippet is additional text that's displayed after the title.
-            val snippet = String.format(
-                Locale.getDefault(),
-                "Lat: %1$.5f, Long: %2$.5f",
-                latLng.latitude,
-                latLng.longitude
-            )
-            map.addMarker(
-                MarkerOptions()
-                    .position(latLng)
-                    .title(getString(R.string.dropped_pin))
-                    .snippet(snippet)
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)) // para mudar a cor do marker para azul
-            )
+            val intentAddMarker = Intent(this@MapsActivity, MarkerDetails::class.java)
+            intentAddMarker.putExtra("latitude", latLng.latitude.toString())
+            intentAddMarker.putExtra("longitude", latLng.longitude.toString())
+            startActivityForResult(intentAddMarker, newMarkerActivityRequestCode)
         }
     }
 
@@ -168,7 +169,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                                 var resp: ResponseDelete = response.body()!!
                                 if (resp.status) {
                                     marker.remove()
-                                    deleteSelectedMarker = false
                                     Toast.makeText(
                                         this@MapsActivity,
                                         R.string.markerDeleted,
@@ -179,12 +179,17 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         }
 
                         override fun onFailure(call: Call<ResponseDelete>, t: Throwable) {
-                            Toast.makeText(this@MapsActivity, R.string.markerNotDeleted, Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                this@MapsActivity,
+                                R.string.markerNotDeleted,
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     })
                 } else {
                     Toast.makeText(this, R.string.markerNotFromUser, Toast.LENGTH_SHORT).show()
                 }
+                deleteSelectedMarker = false
             }
             true
         }
@@ -211,7 +216,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         locationPermissionGranted = true
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
         if (requestCode == REQUEST_LOCATION_PERMISSION) {
             if (grantResults.contains(PackageManager.PERMISSION_GRANTED)) {
                 enableMyLocation()
@@ -230,7 +239,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             val sharedPref =
                 getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE)
             with(sharedPref.edit()) {
-                putBoolean(getString(com.example.pm_22689.R.string.loggedin), false)
+                putBoolean(getString(R.string.loggedin), false)
                 commit()
             }
             Log.d("****SHAREDPREF", "Login pref changed to false")
@@ -268,22 +277,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     if (task.isSuccessful) {
                         var location = task.result
                         if (location != null) {
-                            var userMarker = map.addMarker(
-                                MarkerOptions()
-                                    .position(LatLng(location.latitude, location.longitude))
-                                    .title(getString(R.string.dropped_pin))
-                                    .icon( // para mudar a cor do marker para azul
-                                        BitmapDescriptorFactory.defaultMarker(
-                                            BitmapDescriptorFactory.HUE_BLUE
-                                        )
-                                    )
-                            )
-                            saveMarker(
-                                location.latitude,
-                                location.longitude,
-                                getString(R.string.dropped_pin),
-                                userMarker
-                            )
+
+                            val intentAddMarker =
+                                Intent(this@MapsActivity, MarkerDetails::class.java)
+                            intentAddMarker.putExtra("latitude", location.latitude.toString())
+                            intentAddMarker.putExtra("longitude", location.longitude.toString())
+                            startActivityForResult(intentAddMarker, newMarkerActivityRequestCode)
                         }
                     }
                 }
@@ -293,25 +292,79 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun saveMarker(latitude: Double, longitude: Double, tipo: String, marker: com.google.android.gms.maps.model.Marker) {
+    private fun saveMarker(
+        latitude: Double,
+        longitude: Double,
+        tipo: String,
+        marker: com.google.android.gms.maps.model.Marker,
+        descr: String?
+    ) {
         val sharedPref =
             getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE)
         var id = sharedPref.getInt("id", 0)
 
         val request = ServiceBuilder.buildService(EndPoints::class.java)
-        val call = request.saveMarker(id, latitude.toString(), longitude.toString(), tipo)
+        val call = request.saveMarker(id, latitude.toString(), longitude.toString(), tipo, descr)
         call.enqueue(object : Callback<Marker> {
             override fun onResponse(call: Call<Marker>, response: Response<Marker>) {
                 if (response.isSuccessful) {
-                    Toast.makeText(this@MapsActivity, "Marker saved", Toast.LENGTH_SHORT).show()
                     var resp = response.body()!!
                     marker.tag = "0&${resp.id}"
+                    Toast.makeText(this@MapsActivity, R.string.markerSaved, Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<Marker>, t: Throwable) {
-                Toast.makeText(this@MapsActivity, "Marker not saved", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MapsActivity, R.string.markerNotSaved, Toast.LENGTH_SHORT).show()
             }
         })
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == newMarkerActivityRequestCode && resultCode == Activity.RESULT_OK) {    //add note
+            data?.getStringExtra(MarkerDetails.EXTRA_DATA_DESCR)?.let {
+                    var latitude = data.getStringExtra(MarkerDetails.EXTRA_DATA_LAT)!!.toDouble()
+                    var longitude = data.getStringExtra(MarkerDetails.EXTRA_DATA_LOG)!!.toDouble()
+                    var tipo = data.getStringExtra(MarkerDetails.EXTRA_DATA_TIPO)
+                    var descr = data.getStringExtra(MarkerDetails.EXTRA_DATA_DESCR)
+                    var userMarker: com.google.android.gms.maps.model.Marker
+                    descr = if (!TextUtils.isEmpty(descr)) {
+                        String.format(
+                            Locale.getDefault(),
+                            descr.toString()
+                        )
+                    } else {
+                        String.format(
+                            Locale.getDefault(),
+                            "Lat: %1$.5f, Long: %2$.5f",
+                            latitude.toFloat(),
+                            longitude.toFloat()
+                        )
+                    }
+
+                    userMarker = map.addMarker(
+                        MarkerOptions()
+                            .position(LatLng(latitude, longitude))
+                            .snippet(descr)
+                            .icon( // para mudar a cor do marker para azul
+                                BitmapDescriptorFactory.defaultMarker(
+                                    BitmapDescriptorFactory.HUE_BLUE
+                                )
+                            )
+                    )
+                    if (tipo != null) {
+                        userMarker.title = tipo
+                        saveMarker(latitude, longitude, tipo, userMarker, descr)
+                    }
+            }
+        } else if (requestCode == updateMarkerActivityRequestCode && resultCode == Activity.RESULT_OK) { //update note
+            data?.getStringExtra(MarkerDetails.EXTRA_DATA_DESCR)?.let {
+
+            }
+        } else {
+            Toast.makeText(applicationContext, R.string.markerNotSaved, Toast.LENGTH_LONG).show()
+        }
     }
 }

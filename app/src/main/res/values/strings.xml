@@ -41,4 +41,17 @@
     <string name="deleteMarker">Delete a marker</string>
     <string name="selectMarkerToDelete">Press on a marker to delete it</string>
     <string name="markerNotDeleted">Something went wrong with deleting</string>
+    <string name="textTipo">Type:</string>
+    <string name="textCoords">Coords:</string>
+    <string name="textDescr">Description:</string>
+
+    <string-array name="Tipos">
+        <item>Acidente rodoviário</item>
+        <item>Obras</item>
+        <item>Perigo</item>
+    </string-array>
+    <string name="emptyTextView">Nothing to show</string>
+    <string name="markerSaved">Marker saved</string>
+    <string name="markerNotSaved">Marker not Saved</string>
+    <string name="markerDescHint">Describe the problem</string>
 </resources>
