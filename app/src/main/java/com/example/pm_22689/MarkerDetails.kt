@@ -31,9 +31,13 @@ class MarkerDetails : AppCompatActivity() {
             longitude = intent.getStringExtra("longitude").toString()
             coordsText.text = "Lat: $latitude | Long: $longitude"
             descr = intent.getStringExtra("descr").toString()
-            descrText.setText(descr)              // sets the text of the EditText with the intent content
-            descrText.setSelection(descr.length)
-            descrText.requestFocus()             // puts the cursor at the end of the text
+            if (descr == null || descr.contentEquals("null")) {
+                descrText.requestFocus()                                    // puts the cursor at the end of the text
+            }else  {
+                descrText.setText(descr)
+                descrText.setSelection(descr.length)
+                descrText.requestFocus()
+            }
         }
 
         if (spinner != null) {
@@ -59,9 +63,9 @@ class MarkerDetails : AppCompatActivity() {
         val button = findViewById<Button>(R.id.btnSaveMarker)
         button.setOnClickListener {
             val replyIntent = Intent()
-            if (tipo == null) {         // if no type is selected
-                setResult(Activity.RESULT_CANCELED, replyIntent)
-            } else {
+            //if (tipo == null) {         // if no type is selected
+             //   setResult(Activity.RESULT_CANCELED, replyIntent)
+            //} else {
                 descr = descrText.text.toString()
                 replyIntent.putExtra(EXTRA_DATA_DESCR, descr)
                 if (latitude != null && longitude != null){
@@ -69,7 +73,7 @@ class MarkerDetails : AppCompatActivity() {
                     replyIntent.putExtra(EXTRA_DATA_LOG, longitude)
                     replyIntent.putExtra(EXTRA_DATA_TIPO, tipo)
                     setResult(Activity.RESULT_OK, replyIntent)
-                }
+              //  }
             }
             finish()
         }

@@ -28,7 +28,7 @@ interface EndPoints {
         @Field("latitude") lat: String,
         @Field("longitude") lon: String,
         @Field("tipo") tipo: String,
-        @Field("descricao") descr: String?
+        @Field("descr") descr: String?
     ): Call<Marker>
 
     /**

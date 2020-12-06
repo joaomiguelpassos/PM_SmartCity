@@ -151,13 +151,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun onInfoWindowLongClick(map: GoogleMap) {
         map.setOnInfoWindowLongClickListener {
-            val intentAddMarker = Intent(this@MapsActivity, MarkerDetails::class.java)
-            intentAddMarker.putExtra("latitude", it.position.latitude.toString())
-            intentAddMarker.putExtra("longitude", it.position.longitude.toString())
-            intentAddMarker.putExtra("descr", it.snippet)
-            //it.remove()
-            tempMarker = it
-            startActivityForResult(intentAddMarker, newMarkerActivityRequestCode)
+            var splitTag: String = it.tag.toString()
+            var tagID = splitTag.split("&").toTypedArray()
+            if (tagID[0].toInt() == 0) {
+                val intentAddMarker = Intent(this@MapsActivity, MarkerDetails::class.java)
+                intentAddMarker.putExtra("latitude", it.position.latitude.toString())
+                intentAddMarker.putExtra("longitude", it.position.longitude.toString())
+                intentAddMarker.putExtra("descr", it.snippet)
+                //it.remove()
+                tempMarker = it
+                startActivityForResult(intentAddMarker, newMarkerActivityRequestCode)
+            } else {
+                Toast.makeText(this, R.string.markerNotFromUser, Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -226,8 +232,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             )
             return
         }
-        map.isMyLocationEnabled =
-            true              // enables the blue dot representing the user location (My Location Layer)
+        map.isMyLocationEnabled = true              // enables the blue dot representing the user location (My Location Layer)
         locationPermissionGranted = true
     }
 
@@ -324,13 +329,17 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             override fun onResponse(call: Call<Marker>, response: Response<Marker>) {
                 if (response.isSuccessful) {
                     var resp = response.body()!!
+                    Log.d("****saveMarker", "onResponse: ${resp.id}")
                     marker.tag = "0&${resp.id}"
-                    Toast.makeText(this@MapsActivity, R.string.markerSaved, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MapsActivity, R.string.markerSaved, Toast.LENGTH_SHORT)
+                        .show()
                 }
             }
 
             override fun onFailure(call: Call<Marker>, t: Throwable) {
-                Toast.makeText(this@MapsActivity, R.string.markerNotSaved, Toast.LENGTH_SHORT).show()
+                Log.d("****saveMarker", "onFailure: Não gravou na BD")
+                Toast.makeText(this@MapsActivity, R.string.markerNotSaved, Toast.LENGTH_SHORT)
+                    .show()
             }
         })
     }
@@ -358,6 +367,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             }
 
             override fun onFailure(call: Call<Marker>, t: Throwable) {
+                Log.d("****updateMarker", "onFailure: Não gravou na BD")
                 Toast.makeText(this@MapsActivity, R.string.markerNotSaved, Toast.LENGTH_SHORT).show()
             }
         })
@@ -372,7 +382,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 var longitude = data.getStringExtra(MarkerDetails.EXTRA_DATA_LOG)!!.toDouble()
                 var tipo = data.getStringExtra(MarkerDetails.EXTRA_DATA_TIPO)
                 var descr = data.getStringExtra(MarkerDetails.EXTRA_DATA_DESCR)
-                Log.d("****tag", "onActivityResult: $descr")
+                Log.d("****passei aqui", "onActivityResult: $descr")
                 var userMarker: com.google.android.gms.maps.model.Marker
                 descr = if (!TextUtils.isEmpty(descr)) {
                     String.format(
@@ -416,6 +426,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
             }
         } else {
+            Log.d("****onActivityResult", "Result code not OK")
             Toast.makeText(applicationContext, R.string.markerNotSaved, Toast.LENGTH_LONG).show()
         }
     }
