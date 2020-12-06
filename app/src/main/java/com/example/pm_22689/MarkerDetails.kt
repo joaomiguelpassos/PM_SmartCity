@@ -3,8 +3,10 @@ package com.example.pm_22689
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Bitmap
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.MediaStore
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
@@ -13,6 +15,7 @@ import android.widget.*
 class MarkerDetails : AppCompatActivity() {
     private var latitude: String? = null
     private var longitude: String? = null
+    private val cameraRequestCode = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,7 +34,7 @@ class MarkerDetails : AppCompatActivity() {
             longitude = intent.getStringExtra("longitude").toString()
             coordsText.text = "Lat: $latitude | Long: $longitude"
             descr = intent.getStringExtra("descr").toString()
-            if (descr == null || descr.contentEquals("null")) {
+            if (descr.contentEquals("null")) {
                 descrText.requestFocus()                                    // puts the cursor at the end of the text
             }else  {
                 descrText.setText(descr)
@@ -76,6 +79,29 @@ class MarkerDetails : AppCompatActivity() {
               //  }
             }
             finish()
+        }
+
+        val captureBTN = findViewById<Button>(R.id.buttonCapture)
+        captureBTN.setOnClickListener{
+            val callCameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            if (callCameraIntent.resolveActivity(packageManager) != null) {
+                startActivityForResult(callCameraIntent, cameraRequestCode)
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        val imageMarker = findViewById<ImageView>(R.id.markerImage)
+        when(requestCode) {
+            cameraRequestCode -> {
+                if (resultCode == Activity.RESULT_OK && data != null) {
+                    imageMarker.setImageBitmap(data.extras?.get("data") as Bitmap)
+                }
+            }
+            else -> {
+                Toast.makeText(this, "Unrecognized request code", Toast.LENGTH_SHORT)
+            }
         }
     }
 

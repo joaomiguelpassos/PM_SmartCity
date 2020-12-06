@@ -69,19 +69,46 @@
         android:layout_width="240dp"
         android:layout_height="98dp"
         android:layout_marginTop="48dp"
+        android:hint="@string/markerDescHint"
         android:inputType="textLongMessage"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/textDescr"
-        app:layout_constraintTop_toBottomOf="@+id/markerCoords"
-        android:hint="@string/markerDescHint"/>
+        app:layout_constraintTop_toBottomOf="@+id/markerCoords" />
 
     <Button
         android:id="@+id/btnSaveMarker"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="36dp"
+        android:layout_marginTop="44dp"
+        android:layout_marginEnd="64dp"
+        android:layout_marginRight="64dp"
         android:text="@string/button_save"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/markerDescr" />
+
+    <ImageView
+        android:id="@+id/markerImage"
+        android:layout_width="240dp"
+        android:layout_height="235dp"
+        android:layout_marginTop="64dp"
+        android:layout_marginBottom="32dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttonCapture"
+        app:srcCompat="@mipmap/ic_launcher" />
+
+    <Button
+        android:id="@+id/buttonCapture"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="64dp"
+        android:layout_marginLeft="64dp"
+        android:layout_marginTop="44dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginRight="32dp"
+        android:text="@string/captureImage"
+        app:layout_constraintEnd_toStartOf="@+id/btnSaveMarker"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/markerDescr" />
 </androidx.constraintlayout.widget.ConstraintLayout>

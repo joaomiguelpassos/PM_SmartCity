@@ -54,4 +54,5 @@
     <string name="markerSaved">Marker saved</string>
     <string name="markerNotSaved">Marker not Saved</string>
     <string name="markerDescHint">Describe the problem</string>
+    <string name="captureImage">Capture</string>
 </resources>

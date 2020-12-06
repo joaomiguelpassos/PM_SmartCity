@@ -44,4 +44,5 @@
     <string name="markerSaved">Ponto guardado</string>
     <string name="markerNotSaved">Erro ao guardar</string>
     <string name="markerDescHint">Descreva o problema</string>
+    <string name="captureImage">Tirar foto</string>
 </resources>
