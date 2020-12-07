@@ -15,6 +15,9 @@
         android:id="@+id/mapnotes"
         android:title="@string/view_notes"/>
     <item
+        android:title="Filtrar"
+        android:id="@+id/mapFilter"/>
+    <item
         android:id="@+id/logout"
         android:title="@string/logout"/>
 </menu>

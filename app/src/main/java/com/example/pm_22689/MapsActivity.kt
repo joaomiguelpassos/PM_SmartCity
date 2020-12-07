@@ -167,7 +167,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-
     private fun setMarkerClick(map: GoogleMap) {
         map.setOnMarkerClickListener { marker ->
             if (marker.isInfoWindowShown) {
@@ -279,6 +278,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         R.id.deleteMarker -> {
             deleteSelectedMarker = true
             Toast.makeText(this, R.string.selectMarkerToDelete, Toast.LENGTH_SHORT).show()
+            true
+        }
+        R.id.mapFilter -> {
+            //val intentfilter = Intent(this, )
             true
         }
         else -> super.onOptionsItemSelected(item)
