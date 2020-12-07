@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Smart City</string>
+    <string name="app_name">Cidade Inteligente</string>
     <string name="menu_notes">Notas</string>
     <string name="create_new_note">Criar</string>
     <string name="view_notes">Consultar notas</string>
@@ -45,4 +45,8 @@
     <string name="markerNotSaved">Erro ao guardar</string>
     <string name="markerDescHint">Descreva o problema</string>
     <string name="captureImage">Tirar foto</string>
+    <string name="distance">Insira a distância em km</string>
+    <string name="filterType">Filtrar por tipo</string>
+    <string name="filterDistance">Filtrar por distância</string>
+    <string name="resetFilter">Limpar filtro</string>
 </resources>

@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
@@ -28,21 +29,24 @@ import retrofit2.Response
 import java.util.*
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
-
-    private lateinit var map: GoogleMap
     private val REQUEST_LOCATION_PERMISSION = 1
-    private var locationPermissionGranted = false
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private lateinit var markers: List<Marker>
-    private var deleteSelectedMarker = false
     private val newMarkerActivityRequestCode = 1
     private val updateMarkerActivityRequestCode = 2
+    private val filterByDistance = 3
+    private val filterByType = 4
+
+    private lateinit var map: GoogleMap
+    private var locationPermissionGranted = false
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+
+    private lateinit var markers: List<Marker>
+    private var deleteSelectedMarker = false
     private var tempMarker: com.google.android.gms.maps.model.Marker? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val sharedPref =
-            getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE)
+        val sharedPref = getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE)
         // Lê das Shared Prefs se o utilizador já fez login e se não, inícia a atividade do login
         if (!sharedPref.getBoolean(getString(R.string.loggedin), false)) {
             val intentlogin = Intent(this, LoginActivity::class.java)
@@ -61,8 +65,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
             val request = ServiceBuilder.buildService(EndPoints::class.java)
             val call = request.getMarkers()
-            var position: LatLng
-            var snippet: String
             call.enqueue(object : Callback<List<Marker>> {
                 override fun onResponse(
                     call: Call<List<Marker>>,
@@ -70,47 +72,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 ) {
                     if (response.isSuccessful) {
                         markers = response.body()!!
-                        for (marker in markers) {
-                            position = LatLng(
-                                marker.latitude.toDouble(),
-                                marker.longitude.toDouble()
-                            )
-                            snippet = if (marker.descricao != null) {
-                                String.format(
-                                    Locale.getDefault(),
-                                    marker.descricao.toString()
-                                )
-                            } else {
-                                String.format(
-                                    Locale.getDefault(),
-                                    "Lat: %1$.5f, Long: %2$.5f",
-                                    marker.latitude.toFloat(),
-                                    marker.longitude.toFloat()
-                                )
-                            }
-                            if (marker.idUser == sharedPref.getInt("id", 0)) {
-                                var userMarker = map.addMarker(
-                                    MarkerOptions()
-                                        .position(position)
-                                        .title(marker.tipo)
-                                        .snippet(snippet)
-                                        .icon( // para mudar a cor do marker para azul
-                                            BitmapDescriptorFactory.defaultMarker(
-                                                BitmapDescriptorFactory.HUE_BLUE
-                                            )
-                                        )
-                                )
-                                userMarker.tag = "0&${marker.id}"
-                            } else {
-                                var newMarker = map.addMarker(
-                                    MarkerOptions()
-                                        .position(position)
-                                        .snippet(snippet)
-                                        .title(marker.tipo)
-                                )
-                                newMarker.tag = "1&${marker.id}"
-                            }
-                        }
+                        listAllMarkers()
                     }
                 }
 
@@ -231,7 +193,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             )
             return
         }
-        map.isMyLocationEnabled = true              // enables the blue dot representing the user location (My Location Layer)
+        map.isMyLocationEnabled =
+            true              // enables the blue dot representing the user location (My Location Layer)
         locationPermissionGranted = true
     }
 
@@ -280,8 +243,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             Toast.makeText(this, R.string.selectMarkerToDelete, Toast.LENGTH_SHORT).show()
             true
         }
-        R.id.mapFilter -> {
-            //val intentfilter = Intent(this, )
+        R.id.mapDistanceFilter -> {
+            val intentfilter = Intent(this, FilterActivity::class.java)
+            startActivityForResult(intentfilter, filterByDistance)
+            true
+        }
+        R.id.mapTypeFilter -> {
+            val intentfilter = Intent(this, FilterActivity::class.java)
+            intentfilter.putExtra("type", true)
+            startActivityForResult(intentfilter, filterByType)
+            true
+        }
+        R.id.resetFilter -> {
+            listAllMarkers()
             true
         }
         else -> super.onOptionsItemSelected(item)
@@ -359,19 +333,22 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         var id = sharedPref.getInt("id", 0)
 
         val request = ServiceBuilder.buildService(EndPoints::class.java)
-        val call = request.updateMarker(id, id, latitude.toString(), longitude.toString(), tipo, descr)
+        val call =
+            request.updateMarker(id, id, latitude.toString(), longitude.toString(), tipo, descr)
         call.enqueue(object : Callback<Marker> {
             override fun onResponse(call: Call<Marker>, response: Response<Marker>) {
                 if (response.isSuccessful) {
                     var resp = response.body()!!
                     marker.tag = "0&${resp.id}"
-                    Toast.makeText(this@MapsActivity, R.string.markerSaved, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MapsActivity, R.string.markerSaved, Toast.LENGTH_SHORT)
+                        .show()
                 }
             }
 
             override fun onFailure(call: Call<Marker>, t: Throwable) {
                 Log.d("****updateMarker", "onFailure: Não gravou na BD")
-                Toast.makeText(this@MapsActivity, R.string.markerNotSaved, Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MapsActivity, R.string.markerNotSaved, Toast.LENGTH_SHORT)
+                    .show()
             }
         })
     }
@@ -380,28 +357,27 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (resultCode == Activity.RESULT_OK) {    //add note
-            data?.getStringExtra(MarkerDetails.EXTRA_DATA_DESCR)?.let {
-                var latitude = data.getStringExtra(MarkerDetails.EXTRA_DATA_LAT)!!.toDouble()
-                var longitude = data.getStringExtra(MarkerDetails.EXTRA_DATA_LOG)!!.toDouble()
-                var tipo = data.getStringExtra(MarkerDetails.EXTRA_DATA_TIPO)
-                var descr = data.getStringExtra(MarkerDetails.EXTRA_DATA_DESCR)
-                Log.d("****passei aqui", "onActivityResult: $descr")
-                var userMarker: com.google.android.gms.maps.model.Marker
-                descr = if (!TextUtils.isEmpty(descr)) {
-                    String.format(
-                        Locale.getDefault(),
-                        descr.toString()
-                    )
-                } else {
-                    String.format(
-                        Locale.getDefault(),
-                        "Lat: %1$.5f, Long: %2$.5f",
-                        latitude.toFloat(),
-                        longitude.toFloat()
-                    )
-                }
-
-                if (requestCode == newMarkerActivityRequestCode){
+            if (requestCode == newMarkerActivityRequestCode) {
+                data?.getStringExtra(MarkerDetails.EXTRA_DATA_DESCR)?.let {
+                    var latitude = data.getStringExtra(MarkerDetails.EXTRA_DATA_LAT)!!.toDouble()
+                    var longitude = data.getStringExtra(MarkerDetails.EXTRA_DATA_LOG)!!.toDouble()
+                    var tipo = data.getStringExtra(MarkerDetails.EXTRA_DATA_TIPO)
+                    var descr = data.getStringExtra(MarkerDetails.EXTRA_DATA_DESCR)
+                    Log.d("****passei aqui", "onActivityResult: $descr")
+                    var userMarker: com.google.android.gms.maps.model.Marker
+                    descr = if (!TextUtils.isEmpty(descr)) {
+                        String.format(
+                            Locale.getDefault(),
+                            descr.toString()
+                        )
+                    } else {
+                        String.format(
+                            Locale.getDefault(),
+                            "Lat: %1$.5f, Long: %2$.5f",
+                            latitude.toFloat(),
+                            longitude.toFloat()
+                        )
+                    }
                     if (tipo != null) {
                         tempMarker?.remove()
                         tempMarker = null
@@ -418,7 +394,30 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         userMarker.title = tipo
                         saveMarker(latitude, longitude, tipo, userMarker, descr)
                     }
-                } else if (requestCode == updateMarkerActivityRequestCode){
+                }
+            } else if (requestCode == updateMarkerActivityRequestCode) {
+                data?.getStringExtra(MarkerDetails.EXTRA_DATA_DESCR)?.let {
+                    var latitude =
+                        data.getStringExtra(MarkerDetails.EXTRA_DATA_LAT)!!.toDouble()
+                    var longitude =
+                        data.getStringExtra(MarkerDetails.EXTRA_DATA_LOG)!!.toDouble()
+                    var tipo = data.getStringExtra(MarkerDetails.EXTRA_DATA_TIPO)
+                    var descr = data.getStringExtra(MarkerDetails.EXTRA_DATA_DESCR)
+                    Log.d("****passei aqui", "onActivityResult: $descr")
+                    var userMarker: com.google.android.gms.maps.model.Marker
+                    descr = if (!TextUtils.isEmpty(descr)) {
+                        String.format(
+                            Locale.getDefault(),
+                            descr.toString()
+                        )
+                    } else {
+                        String.format(
+                            Locale.getDefault(),
+                            "Lat: %1$.5f, Long: %2$.5f",
+                            latitude.toFloat(),
+                            longitude.toFloat()
+                        )
+                    }
                     if (tipo != null) {
                         tempMarker!!.title = tipo
                         tempMarker!!.snippet = descr
@@ -427,10 +426,159 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     }
                 }
 
+            } else if (requestCode == filterByType){
+                val reply = data?.getStringExtra("answer")
+                filterByType(reply)
+                
+            } else if (requestCode == filterByDistance) {
+                val reply = data?.getStringExtra("answer")?.toInt()
+                filterByDistance(reply)
             }
         } else {
             Log.d("****onActivityResult", "Result code not OK")
-            Toast.makeText(applicationContext, R.string.markerNotSaved, Toast.LENGTH_LONG).show()
+            Toast.makeText(applicationContext, R.string.markerNotSaved, Toast.LENGTH_LONG)
+                .show()
         }
+    }
+
+    private fun listAllMarkers(){
+        val sharedPref = getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE)
+        map.clear()
+        for (marker in markers) {
+            var position = LatLng(
+                marker.latitude.toDouble(),
+                marker.longitude.toDouble()
+            )
+            var snippet = if (marker.descricao != null) {
+                String.format(
+                    Locale.getDefault(),
+                    marker.descricao.toString()
+                )
+            } else {
+                String.format(
+                    Locale.getDefault(),
+                    "Lat: %1$.5f, Long: %2$.5f",
+                    marker.latitude.toFloat(),
+                    marker.longitude.toFloat()
+                )
+            }
+            if (marker.idUser == sharedPref.getInt("id", 0)) {
+                var userMarker = map.addMarker(
+                    MarkerOptions()
+                        .position(position)
+                        .title(marker.tipo)
+                        .snippet(snippet)
+                        .icon( // para mudar a cor do marker para azul
+                            BitmapDescriptorFactory.defaultMarker(
+                                BitmapDescriptorFactory.HUE_BLUE
+                            )
+                        )
+                )
+                userMarker.tag = "0&${marker.id}"
+            } else {
+                var newMarker = map.addMarker(
+                    MarkerOptions()
+                        .position(position)
+                        .snippet(snippet)
+                        .title(marker.tipo)
+                )
+                newMarker.tag = "1&${marker.id}"
+            }
+        }
+    }
+    
+    private fun filterByType(type: String?) = if(type.isNullOrBlank()) {
+        Toast.makeText(this, "Tem que inserir um tipo", Toast.LENGTH_SHORT).show()
+    } else {
+        map.clear()
+        for (marker in markers) {
+            var position = LatLng(
+                marker.latitude.toDouble(),
+                marker.longitude.toDouble()
+            )
+            var snippet = if (marker.descricao != null) {
+                String.format(
+                    Locale.getDefault(),
+                    marker.descricao.toString()
+                )
+            } else {
+                String.format(
+                    Locale.getDefault(),
+                    "Lat: %1$.5f, Long: %2$.5f",
+                    marker.latitude.toFloat(),
+                    marker.longitude.toFloat()
+                )
+            }
+            if (marker.tipo == type) {
+                map.addMarker(
+                    MarkerOptions()
+                        .position(position)
+                        .title(marker.tipo)
+                        .snippet(snippet)
+                        .icon(
+                            BitmapDescriptorFactory.defaultMarker(
+                                BitmapDescriptorFactory.HUE_GREEN
+                            )
+                        )
+                )
+            }
+        }
+    }
+
+    private fun filterByDistance(distance: Int?){
+        map.clear()
+        try {
+            if (locationPermissionGranted) {
+                val locationResult = fusedLocationClient.lastLocation
+                locationResult.addOnCompleteListener(this) { task ->
+                    if (task.isSuccessful) {
+                        var location = task.result
+                        if (location != null) {
+                            for (marker in markers) {
+                                var position = LatLng(
+                                    marker.latitude.toDouble(),
+                                    marker.longitude.toDouble()
+                                )
+                                var distanceToMarker = calculateDistance(location.latitude,position.latitude,location.longitude,position.longitude)
+                                var snippet = if (marker.descricao != null) {
+                                    String.format(
+                                        Locale.getDefault(),
+                                        "Distance: %1$.2f",
+                                        distanceToMarker.toFloat()
+                                    )
+                                } else {
+                                    String.format(
+                                        Locale.getDefault(),
+                                        "Distance: %1$.2f",
+                                        distanceToMarker.toFloat()
+                                    )
+                                }
+                                if (distanceToMarker < distance!!*1000) {
+                                    map.addMarker(
+                                        MarkerOptions()
+                                            .position(position)
+                                            .title(marker.tipo)
+                                            .snippet(snippet)
+                                            .icon(
+                                                BitmapDescriptorFactory.defaultMarker(
+                                                    BitmapDescriptorFactory.HUE_GREEN
+                                                )
+                                            )
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (e: SecurityException) {
+            Log.e("Exception: %s", e.message, e)
+        }
+    }
+
+    private fun calculateDistance(lat1: Double, lat2: Double, lng1:Double, lng2: Double): Float {
+        val results = FloatArray(1)
+        Location.distanceBetween(lat1,lng1,lat2,lng2, results)
+        return results[0]
     }
 }

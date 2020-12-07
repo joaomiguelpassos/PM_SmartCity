@@ -55,4 +55,9 @@
     <string name="markerNotSaved">Marker not Saved</string>
     <string name="markerDescHint">Describe the problem</string>
     <string name="captureImage">Capture</string>
+    <string name="distance">Insert the distance in km</string>
+    <string name="hint_filter" translatable="false">Acidente Rodoviário / Obras / Perigo</string>
+    <string name="filterType">Filter by type</string>
+    <string name="filterDistance">Filter by distance</string>
+    <string name="resetFilter">Reset filter</string>
 </resources>
