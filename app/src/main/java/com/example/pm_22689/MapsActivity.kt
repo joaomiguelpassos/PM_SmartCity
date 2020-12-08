@@ -54,7 +54,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             intentlogin.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intentlogin)
         } else {
-
             setContentView(R.layout.activity_maps)
             // Obtain the SupportMapFragment and get notified when the map is ready to be used.
             val mapFragment =
@@ -308,6 +307,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     var resp = response.body()!!
                     Log.d("****saveMarker", "onResponse: ${resp.id}")
                     marker.tag = "0&${resp.id}"
+                    markers.plus(resp)
+                    Log.d("****TAG", "onResponse: $markers")
                     Toast.makeText(this@MapsActivity, R.string.markerSaved, Toast.LENGTH_SHORT)
                         .show()
                 }
@@ -490,6 +491,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun filterByType(type: String?) = if(type.isNullOrBlank()) {
         Toast.makeText(this, "Tem que inserir um tipo", Toast.LENGTH_SHORT).show()
     } else {
+        val sharedPref = getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE)
         map.clear()
         for (marker in markers) {
             var position = LatLng(
@@ -510,7 +512,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 )
             }
             if (marker.tipo == type) {
-                map.addMarker(
+                var userMarker = map.addMarker(
                     MarkerOptions()
                         .position(position)
                         .title(marker.tipo)
@@ -521,11 +523,17 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                             )
                         )
                 )
+                if (marker.idUser == sharedPref.getInt("id", 0)) {
+                    userMarker.tag = "0&${marker.id}"
+                } else {
+                    userMarker.tag = "1&${marker.id}"
+                }
             }
         }
     }
 
     private fun filterByDistance(distance: Int?){
+        val sharedPref = getSharedPreferences(getString(R.string.preference_file), Context.MODE_PRIVATE)
         map.clear()
         try {
             if (locationPermissionGranted) {
@@ -554,7 +562,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                                     )
                                 }
                                 if (distanceToMarker < distance!!*1000) {
-                                    map.addMarker(
+                                    var userMarker = map.addMarker(
                                         MarkerOptions()
                                             .position(position)
                                             .title(marker.tipo)
@@ -565,6 +573,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                                                 )
                                             )
                                     )
+                                    if (marker.idUser == sharedPref.getInt("id", 0)) {
+                                        userMarker.tag = "0&${marker.id}"
+                                    } else {
+                                        userMarker.tag = "1&${marker.id}"
+                                    }
                                 }
                             }
                         }
