@@ -5,6 +5,10 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -12,7 +16,9 @@ import android.text.TextUtils
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import com.example.pm_22689.api.*
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -22,13 +28,14 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.util.*
 
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
+class MapsActivity : AppCompatActivity(), OnMapReadyCallback, SensorEventListener {
     private val REQUEST_LOCATION_PERMISSION = 1
     private val newMarkerActivityRequestCode = 1
     private val updateMarkerActivityRequestCode = 2
@@ -43,6 +50,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private var deleteSelectedMarker = false
     private var tempMarker: com.google.android.gms.maps.model.Marker? = null
 
+    private lateinit var mSensorManager : SensorManager
+    private var mLuminosity : Sensor ?= null
+    private var resume = true;
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,8 +91,29 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     Log.d("****MAP", "failure")
                 }
             })
-        }
 
+            mSensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+
+            mLuminosity = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        mSensorManager.registerListener(this, mLuminosity, SensorManager.SENSOR_DELAY_NORMAL)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mSensorManager.unregisterListener(this)
+    }
+
+    fun resumeReading(view: View) {
+        this.resume = true
+    }
+
+    fun pauseReading(view: View) {
+        this.resume = false
     }
 
     /**
@@ -615,5 +646,24 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val results = FloatArray(1)
         Location.distanceBetween(lat1,lng1,lat2,lng2, results)
         return results[0]
+    }
+
+    override fun onSensorChanged(event: SensorEvent?) {
+        if (event != null && resume) {
+            if (event.sensor.type == Sensor.TYPE_LIGHT) {
+                if(event.values[0] >= 100){
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                    delegate.applyDayNight()
+                    Log.d("****", "onSensorChanged: Light Mode")
+                } else {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                    delegate.applyDayNight()
+                    Log.d("****", "onSensorChanged: Dark Mode")
+                }
+            }
+        }
+    }
+
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
     }
 }
