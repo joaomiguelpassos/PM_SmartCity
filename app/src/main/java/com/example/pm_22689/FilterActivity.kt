@@ -5,12 +5,13 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 
 /**
- * Activity where the user will choose how to filter - distance or type
+ * Activity where the user inserts the data relative to filter
  * onCreate checks how user pretends to filter and changes TextViews text's
  */
 class FilterActivity : AppCompatActivity() {
@@ -35,7 +36,12 @@ class FilterActivity : AppCompatActivity() {
             if(TextUtils.isEmpty(editFilter.text)) {
                 setResult(Activity.RESULT_CANCELED, replyIntent)
             } else {
-                val answer = editFilter.text.toString()
+                var answer = editFilter.text.toString()
+                if(intent.hasExtra("type")){
+                    answer.trim()
+                    answer.capitalize()
+                    Log.d("****Button", "onCreate: $answer")
+                }
                 replyIntent.putExtra("answer", answer)
                 setResult(Activity.RESULT_OK, replyIntent)
             }

@@ -85,6 +85,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     }
 
+    /**
+     * Method that initializes the map, calling all the
+     */
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
         /**
@@ -101,6 +104,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         enableMyLocation()
     }
 
+    /**
+     * Method that handles a long click listener on the map and
+     * allows the user to create a marker on the selected coords
+     */
     private fun setMapLongClick(map: GoogleMap) {
         map.setOnMapLongClickListener { latLng ->
             val intentAddMarker = Intent(this@MapsActivity, MarkerDetails::class.java)
@@ -110,6 +117,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    /**
+     * Method that handles a long click listener on the
+     * floating info window and allows de user to update
+     */
     private fun onInfoWindowLongClick(map: GoogleMap) {
         map.setOnInfoWindowLongClickListener {
             var splitTag: String = it.tag.toString()
@@ -128,6 +139,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    /**
+     * Method that handles a click on a marker in order to delete it
+     */
     private fun setMarkerClick(map: GoogleMap) {
         map.setOnMarkerClickListener { marker ->
             if (marker.isInfoWindowShown) {
@@ -215,6 +229,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         return true
     }
 
+
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.logout -> {
             val sharedPref =
@@ -269,11 +284,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         try {
             if (locationPermissionGranted) {
                 val locationResult = fusedLocationClient.lastLocation
-                locationResult.addOnCompleteListener(this) { task ->
+                locationResult.addOnCompleteListener(this) { task ->    // adds a complete listener to get a location
                     if (task.isSuccessful) {
                         var location = task.result
                         if (location != null) {
-
                             val intentAddMarker =
                                 Intent(this@MapsActivity, MarkerDetails::class.java)
                             intentAddMarker.putExtra("latitude", location.latitude.toString())
@@ -288,6 +302,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    /**
+     * Method that calls the webservice in order to save
+     * a marker. Response returns the object
+     */
     private fun saveMarker(
         latitude: Double,
         longitude: Double,
@@ -322,6 +340,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         })
     }
 
+    /**
+     * Method that calls the web service in order to update
+     * a record in a DB. Returns the full object
+     */
     private fun updateMarker(
         latitude: Double,
         longitude: Double,
@@ -511,7 +533,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     marker.longitude.toFloat()
                 )
             }
-            if (marker.tipo == type) {
+            if (marker.tipo == type) { // if the tipo define on the marker equals type - tipo choosen by user - lists marker
                 var userMarker = map.addMarker(
                     MarkerOptions()
                         .position(position)

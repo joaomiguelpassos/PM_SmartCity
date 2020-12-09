@@ -12,6 +12,10 @@ import android.util.Log
 import android.view.View
 import android.widget.*
 
+/**
+ * Activity where the user selects type and description for a marker
+ * The fields can be empty when inserting or filled when updating
+ */
 class MarkerDetails : AppCompatActivity() {
     private var latitude: String? = null
     private var longitude: String? = null
@@ -58,7 +62,7 @@ class MarkerDetails : AppCompatActivity() {
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>) {
-
+                    // does nothing
                 }
             }
         }
@@ -66,17 +70,13 @@ class MarkerDetails : AppCompatActivity() {
         val button = findViewById<Button>(R.id.btnSaveMarker)
         button.setOnClickListener {
             val replyIntent = Intent()
-            //if (tipo == null) {         // if no type is selected
-             //   setResult(Activity.RESULT_CANCELED, replyIntent)
-            //} else {
-                descr = descrText.text.toString()
-                replyIntent.putExtra(EXTRA_DATA_DESCR, descr)
-                if (latitude != null && longitude != null){
-                    replyIntent.putExtra(EXTRA_DATA_LAT, latitude)
-                    replyIntent.putExtra(EXTRA_DATA_LOG, longitude)
-                    replyIntent.putExtra(EXTRA_DATA_TIPO, tipo)
-                    setResult(Activity.RESULT_OK, replyIntent)
-              //  }
+            descr = descrText.text.toString()
+            replyIntent.putExtra(EXTRA_DATA_DESCR, descr)
+            if (latitude != null && longitude != null){
+                replyIntent.putExtra(EXTRA_DATA_LAT, latitude)
+                replyIntent.putExtra(EXTRA_DATA_LOG, longitude)
+                replyIntent.putExtra(EXTRA_DATA_TIPO, tipo)
+                setResult(Activity.RESULT_OK, replyIntent)
             }
             finish()
         }
